@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================
+// 0. AUTHENTICATION & ROLE MANAGEMENT
+// ==========================================================
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+
+  // Relations
+  student  Student?
+  lecturer Lecturer?
+}
+
+enum Role {
+  SUPERADMIN
+  REGISTRAR
+  FINANCE
+  LECTURER
+  STUDENT
+}
+
+// ==========================================================
+// 1. REGISTRAR MODULE (Students, Departments, Courses)
+// ==========================================================
+
+model Student {
+  id             Int       @id @default(autoincrement())
+  studentId      String    @unique
+  userId         Int       @unique
+  firstName      String
+  middleName     String?
+  lastName       String
+  dateOfBirth    DateTime?
+  email          String    @unique
+  phone          String?
+  enrollmentDate DateTime  @default(now())
+  status         String    @default("ACTIVE")
+
+  // Relations
+  user          User                 @relation(fields: [userId], references: [id])
+  registrations CourseRegistration[]
+  payments      Payment[]
+  invoices      Invoice[]
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  programs  Program[]
+  lecturers Lecturer[]
+  courses   Course[]
+}
+
+model Program {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  description   String?
+  durationYears Int            @default(3)
+  departmentId  Int
+  feeStructures FeeStructure[]
+  department    Department     @relation(fields: [departmentId], references: [id])
+}
+
+// ==========================================================
+// COURSES, SEMESTERS, ACADEMIC YEARS
+// ==========================================================
+
+model AcademicYear {
+  id        Int        @id @default(autoincrement())
+  yearLabel String // e.g. "2024/2025"
+  semesters Semester[]
+}
+
+model Semester {
+  id             Int          @id @default(autoincrement())
+  name           String // "Semester I", "Semester II"
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  registrations CourseRegistration[]
+}
+
+model Course {
+  id          Int     @id @default(autoincrement())
+  code        String  @unique
+  title       String
+  credits     Int
+  description String?
+  tuitionFee  Decimal @default(0.00) @db.Decimal(10, 2)
+
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  registrations CourseRegistration[]
+}
+
+// ==========================================================
+// COURSE REGISTRATION & GRADES
+// ==========================================================
+
+model CourseRegistration {
+  id         Int     @id @default(autoincrement())
+  studentId  Int
+  courseId   Int
+  semesterId Int
+  grade      String?
+
+  student  Student  @relation(fields: [studentId], references: [id])
+  course   Course   @relation(fields: [courseId], references: [id])
+  semester Semester @relation(fields: [semesterId], references: [id])
+
+  @@unique([studentId, courseId, semesterId])
+}
+
+// ==========================================================
+// 2. FINANCE MODULE (Fees, Payments, Invoices)
+// ==========================================================
+
+model FeeStructure {
+  id          Int     @id @default(autoincrement())
+  programId   Int
+  yearOfStudy Int // 1st year, 2nd year...
+  amount      Decimal @db.Decimal(10, 2)
+
+  program Program @relation(fields: [programId], references: [id])
+}
+
+model Invoice {
+  id        Int           @id @default(autoincrement())
+  studentId Int
+  amount    Decimal       @db.Decimal(10, 2)
+  dueDate   DateTime
+  status    InvoiceStatus @default(PENDING)
+
+  student  Student   @relation(fields: [studentId], references: [id])
+  payments Payment[]
+}
+
+enum InvoiceStatus {
+  PAID
+  PENDING
+  OVERDUE
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  studentId     Int
+  invoiceId     Int?
+  amountPaid    Decimal  @db.Decimal(10, 2)
+  paymentDate   DateTime @default(now())
+  paymentMethod String?
+
+  student Student  @relation(fields: [studentId], references: [id])
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+// ==========================================================
+// 3. WEBSITE MODULE (Public Content)
+// ==========================================================
+
+model NewsEvent {
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String
+  date     DateTime @default(now())
+  category String
+  isPublic Boolean  @default(true)
+}
+
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+  status    String   @default("PENDING")
+}
+
+// ==========================================================
+// LECTURERS
+// ==========================================================
+
+model Lecturer {
+  id           Int     @id @default(autoincrement())
+  userId       Int     @unique
+  departmentId Int
+  title        String? // Ms., Dr., Prof. etc.
+
+  user       User       @relation(fields: [userId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+}
