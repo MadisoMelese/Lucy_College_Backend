@@ -1,0 +1,43 @@
+import express from "express";
+import authenticate from "../middlewares/auth.middleware.js";
+import roleMiddleware from "../middlewares/role.middleware.js";
+
+import * as NewsCtrl from "../controllers/admin/news.controller.js";
+import * as DeptCtrl from "../controllers/admin/department.controller.js";
+import * as CourseCtrl from "../controllers/admin/course.controller.js";
+import * as InquiryCtrl from "../controllers/admin/inquiry.controller.js";
+
+const router = express.Router();
+
+// require authentication + role for admin routes
+// allow SUPERADMIN and REGISTRAR to manage content; you can adjust roles per resource
+const adminOnly = [ "SUPERADMIN", "REGISTRAR" ];
+
+// News (CRUD)
+router.get("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.list);
+router.post("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.create);
+router.get("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.getOne);
+router.put("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.update);
+router.delete("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.remove);
+
+// Departments
+router.get("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
+router.post("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.create);
+router.get("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
+router.put("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.update);
+router.delete("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
+
+// Courses
+router.get("/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.list);
+router.post("/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.create);
+router.get("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.getOne);
+router.put("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.update);
+router.delete("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
+
+// Inquiries
+router.get("/inquiries", authenticate, roleMiddleware(adminOnly), InquiryCtrl.list);
+router.get("/inquiries/:id", authenticate, roleMiddleware(adminOnly), InquiryCtrl.getOne);
+router.put("/inquiries/:id", authenticate, roleMiddleware(adminOnly), InquiryCtrl.update);
+router.delete("/inquiries/:id", authenticate, roleMiddleware(adminOnly), InquiryCtrl.remove);
+
+export default router;

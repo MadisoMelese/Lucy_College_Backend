@@ -23,6 +23,7 @@ model User {
   lecturer Lecturer?
 }
 
+
 enum Role {
   SUPERADMIN
   REGISTRAR
