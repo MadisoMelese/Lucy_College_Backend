@@ -1,0 +1,727 @@
+openapi: 3.0.3
+info:
+  title: Lucy College Backend API
+  version: 1.0.0
+  description: OpenAPI specification documenting the public and admin routes for Lucy College Backend.
+servers:
+  - url: http://localhost:3000
+    description: Local server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    AuthRegister:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+    AuthLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+    About:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+    Hero:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        imageUrl:
+          type: string
+    GalleryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        imageUrl:
+          type: string
+    Homepage:
+      type: object
+      properties:
+        id:
+          type: string
+        sections:
+          type: array
+          items:
+            type: object
+    Department:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        departmentId:
+          type: string
+        description:
+          type: string
+    News:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+    Inquiry:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRegister'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and receive JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+  /about:
+    get:
+      tags: [About]
+      summary: Get about page content (public)
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [About]
+      summary: Create about content (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/About'
+      responses:
+        '201':
+          description: Created
+  /about/{id}:
+    put:
+      tags: [About]
+      summary: Update about content (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/About'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [About]
+      summary: Delete about content (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /hero:
+    get:
+      tags: [Hero]
+      summary: Get all hero items
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Hero]
+      summary: Create hero item (admin, image upload)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                subtitle:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Created
+  /hero/{id}:
+    put:
+      tags: [Hero]
+      summary: Update hero item (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                subtitle:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Hero]
+      summary: Delete hero item (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /gallery:
+    get:
+      tags: [Gallery]
+      summary: List gallery items (public)
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Gallery]
+      summary: Create gallery item (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Created
+  /gallery/{id}:
+    get:
+      tags: [Gallery]
+      summary: Get gallery item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Gallery]
+      summary: Update gallery item (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Gallery]
+      summary: Delete gallery item (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /homepage:
+    get:
+      tags: [Homepage]
+      summary: Get homepage content (public)
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Homepage]
+      summary: Create homepage entry (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Homepage'
+      responses:
+        '201':
+          description: Created
+  /homepage/{id}:
+    put:
+      tags: [Homepage]
+      summary: Update homepage entry (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Homepage'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Homepage]
+      summary: Delete homepage entry (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+  /api/departments:
+    get:
+      tags: [Website]
+      summary: Get all departments (public)
+      responses:
+        '200':
+          description: OK
+  /api/departments/{id}:
+    get:
+      tags: [Website]
+      summary: Get a department by id (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /api/courses:
+    get:
+      tags: [Website]
+      summary: Get all courses (public)
+      responses:
+        '200':
+          description: OK
+  /api/courses/{id}:
+    get:
+      tags: [Website]
+      summary: Get a course by id (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /api/news:
+    get:
+      tags: [Website]
+      summary: Get all news (public)
+      responses:
+        '200':
+          description: OK
+  /api/news/{id}:
+    get:
+      tags: [Website]
+      summary: Get a news item by id (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /api/inquiry:
+    post:
+      tags: [Website]
+      summary: Submit an inquiry (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inquiry'
+      responses:
+        '201':
+          description: Created
+  /admin/news:
+    get:
+      tags: [Admin]
+      summary: List news (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Create news (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/News'
+      responses:
+        '201':
+          description: Created
+  /admin/news/{id}:
+    get:
+      tags: [Admin]
+      summary: Get news (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Admin]
+      summary: Update news (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/News'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Admin]
+      summary: Remove news (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+  /admin/departments:
+    get:
+      tags: [Admin]
+      summary: List departments (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Create department (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Created
+  /admin/departments/{id}:
+    get:
+      tags: [Admin]
+      summary: Get department (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Admin]
+      summary: Update department (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Admin]
+      summary: Delete department (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+  /admin/courses:
+    get:
+      tags: [Admin]
+      summary: List courses (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Admin]
+      summary: Create course (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+      responses:
+        '201':
+          description: Created
+  /admin/courses/{id}:
+    get:
+      tags: [Admin]
+      summary: Get course (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Admin]
+      summary: Update course (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Course'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Admin]
+      summary: Delete course (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+  /admin/inquiries:
+    get:
+      tags: [Admin]
+      summary: List inquiries (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+  /admin/inquiries/{id}:
+    get:
+      tags: [Admin]
+      summary: Get inquiry (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Admin]
+      summary: Update inquiry (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inquiry'
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Admin]
+      summary: Delete inquiry (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Deleted
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: About
+    description: About page
+  - name: Hero
+    description: Hero banner management
+  - name: Gallery
+    description: Gallery management
+  - name: Homepage
+    description: Homepage content
+  - name: Website
+    description: Public website endpoints (departments, courses, news, inquiry)
+  - name: Admin
+    description: Admin panel endpoints (secured)

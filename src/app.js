@@ -1,4 +1,8 @@
 import express from "express";
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 import path from "path";
 import cors from "cors";
 import helmet from "helmet";
@@ -34,6 +38,8 @@ const limiter = rateLimit({
   legacyHeaders: false
 });
 app.use(limiter);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/uploads", express.static(path.resolve("uploads")));
 // public health
 app.get("/", (req, res) => res.json({ status: "success", message: "Lucy College API is running" }));
