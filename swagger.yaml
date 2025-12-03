@@ -362,7 +362,7 @@ paths:
       responses:
         '204':
           description: Deleted
-  /homepage:
+  /home:
     get:
       tags: [Homepage]
       summary: Get homepage content (public)
@@ -379,11 +379,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Homepage'
+              $ref: '#/components/schemas/Home'
       responses:
         '201':
           description: Created
-  /homepage/{id}:
+  /home/{id}:
     put:
       tags: [Homepage]
       summary: Update homepage entry (admin)

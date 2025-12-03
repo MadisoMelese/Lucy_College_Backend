@@ -30,7 +30,7 @@ node prisma/admin.seed.js
 4. Run the app
 
 ```powershell
-# development (if there is an npm script such as 'dev')
+# development 
 npm run dev
 
 # production
