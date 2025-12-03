@@ -19,6 +19,7 @@
     "express-rate-limit": "^7.5.1",
     "helmet": "^6.2.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {

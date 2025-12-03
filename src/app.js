@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -7,6 +8,11 @@ import rateLimit from "express-rate-limit";
 import websiteRoutes from "./routes/website.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import aboutRoutes from "./routes/about.routes.js";
+import heroRoutes from "./routes/hero.routes.js";
+import galleryRoutes from "./routes/gallery.routes.js";
+import teamRoutes from "./routes/team.routes.js";
+import homepageRoutes from "./routes/homepage.routes.js";
 
 import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
@@ -28,7 +34,7 @@ const limiter = rateLimit({
   legacyHeaders: false
 });
 app.use(limiter);
-
+app.use("/uploads", express.static(path.resolve("uploads")));
 // public health
 app.get("/", (req, res) => res.json({ status: "success", message: "Lucy College API is running" }));
 
@@ -40,6 +46,13 @@ app.use("/auth", authRoutes);
 
 // admin routes (authenticated + role middleware applied inside)
 app.use("/admin", adminRoutes);
+app.use("/about", aboutRoutes);
+
+app.use("/hero", heroRoutes);
+app.use("/home", homepageRoutes);
+app.use("/team", teamRoutes);
+app.use("/gallery", galleryRoutes);
+
 
 // 404 + error handling
 app.use(notFound);

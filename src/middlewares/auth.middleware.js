@@ -17,3 +17,11 @@ export default function authenticate(req, res, next) {
     return errorResponse(res, "Invalid or expired token", 401);
   }
 }
+
+export function isAdmin(req, res, next) {
+  if (req.user.role !== "admin") {
+    return errorResponse(res, "Access denied. Admin only", 403);
+  }
+  next();
+}
+

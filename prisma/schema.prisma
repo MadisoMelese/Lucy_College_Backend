@@ -202,3 +202,72 @@ model Lecturer {
   user       User       @relation(fields: [userId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 }
+
+model About {
+  id         Int      @id @default(autoincrement())
+  title      String
+  subtitle   String?
+  content    String
+  mission    String?
+  vision     String?
+  values     String?
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
+
+
+// Homepage content
+model Homepage {
+  id         Int      @id @default(autoincrement())
+  heroTitle  String?
+  heroSubtitle String?
+  heroCtaText  String?
+  heroCtaUrl   String?
+  introText  String?   // short intro paragraph for homepage
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Hero slider (multiple slides)
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  subtitle  String?
+  imageUrl  String   // required: image URL (cdn/local)
+  ctaText   String?
+  ctaUrl    String?
+  order     Int      @default(0)    // slide ordering
+  isActive  Boolean  @default(true) // show/hide
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Gallery images
+model GalleryImage {
+  id         Int      @id @default(autoincrement())
+  title      String?
+  caption    String?
+  imageUrl   String   // required
+  category   String?  // e.g., "campus", "events", etc.
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Management / Team members
+model TeamMember {
+  id         Int      @id @default(autoincrement())
+  fullName   String
+  role       String   // e.g., "Principal", "Registrar"
+  bio        String?
+  imageUrl   String?  // optional portrait url
+  email      String?  @unique
+  phone      String?
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  social     Json?    // optional JSON object for social links { linkedin: "...", twitter: "..." }
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
