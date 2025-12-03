@@ -2,21 +2,21 @@ import prisma from "../config/database.js";
 
 export const HeroService = {
   getAll() {
-    return prisma.heroSlider.findMany();
+    return prisma.heroSlide.findMany();
   },
 
   create(data) {
-    return prisma.heroSlider.create({ data });
+    return prisma.heroSlide.create({ data });
   },
 
   update(id, data) {
-    return prisma.heroSlider.update({
+    return prisma.heroSlide.update({
       where: { id },
       data,
     });
   },
 
   delete(id) {
-    return prisma.heroSlider.delete({ where: { id } });
+    return prisma.heroSlide.delete({ where: { id } });
   }
 };
