@@ -175,7 +175,10 @@ model NewsEvent {
   id       Int      @id @default(autoincrement())
   title    String
   content  String
-  date     DateTime @default(now())
+  imageUrl  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  expiresAt     DateTime?
   category String
   isPublic Boolean  @default(true)
 }

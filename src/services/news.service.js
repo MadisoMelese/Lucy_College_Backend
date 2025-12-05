@@ -6,7 +6,7 @@ import prisma from "../config/database.js";
 export const getAllNews = async () => { 
   return prisma.newsEvent.findMany({
     where: { isPublic: true },
-    orderBy: { date: "desc" }
+    orderBy: { createdAt: "desc" }
   });
 };
 
@@ -22,7 +22,7 @@ export const getNewsByCategory = async (category, skip, limit) => {
   const [items, total] = await Promise.all([
     prisma.newsEvent.findMany({
       where,
-      orderBy: { date: "desc" },
+      orderBy: { createdAt: "desc" },
       skip,
       take: limit
     }),

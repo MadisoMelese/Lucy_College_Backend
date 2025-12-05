@@ -10,7 +10,7 @@ export const list = async (req, res) => {
 
     const [items, total] = await Promise.all([
       prisma.newsEvent.findMany({
-        orderBy: { date: "desc" },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit
       }),
@@ -32,13 +32,13 @@ export const create = async (req, res) => {
       return errorResponse(res, "title, content & category required", 400);
 
     // ⬅️ HANDLE IMAGE
-    let image = null;
+    let imageUrl = null;
     if (req.file) {
-      image = fileUrl(req, path.join("news", req.file.filename));
+      imageUrl = fileUrl(req, path.join("news", req.file.filename));
     }
 
     const item = await prisma.newsEvent.create({
-      data: { title, content, category, isPublic, image }
+      data: { title, content, category, isPublic, imageUrl }
     });
 
     return created(res, item, "News created");
@@ -102,7 +102,7 @@ export const update = async (req, res) => {
         content,
         category,
         isPublic,
-        ...(image && { image })
+        ...(imageUrl && { imageUrl })
       }
     });
 

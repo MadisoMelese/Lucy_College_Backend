@@ -529,7 +529,9 @@ paths:
               properties:
                 title:
                   type: string
-                content:
+                content: 
+                  type: string
+                category: 
                   type: string
                 image:
                   type: string
