@@ -22,7 +22,7 @@ export const list = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const { title, content, category, isPublic = true } = req.body;
-    if (!title || !content) return errorResponse(res, "title & content required", 400);
+    if (!title || !content || !category) return errorResponse(res, "title, content & category required", 400);
     const item = await prisma.newsEvent.create({ data: { title, content, category, isPublic } });
     return created(res, item, "News created");
   } catch (err) {
@@ -40,6 +40,19 @@ export const getOne = async (req, res) => {
     return errorResponse(res, err.message);
   }
 };
+export const getNewsByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { limit, skip, page } = parsePagination(req);
+    const [items, total] = await Promise.all([ 
+      prisma.newsEvent.findMany({ where: { category }, skip, take: limit }),
+      prisma.newsEvent.count({ where: { category } }),
+    ]);
+    return success(res, { items, total, page, limit });
+  } catch (err) {
+    return errorResponse(res, err.message);
+  }
+   };
 
 export const update = async (req, res) => {
   try {

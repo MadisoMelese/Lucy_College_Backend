@@ -17,6 +17,7 @@ router.get("/courses/:id", CourseController.getOne);
 // News
 router.get("/news", NewsController.getAll);
 router.get("/news/:id", NewsController.getOne);
+router.get("/news/category/:category", NewsController.getByCategory);
 
 // Inquiry
 router.post("/inquiry", InquiryController.create);

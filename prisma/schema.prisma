@@ -179,6 +179,15 @@ model NewsEvent {
   category String
   isPublic Boolean  @default(true)
 }
+model Announcement {
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String
+  category String
+  createdAt DateTime @default(now())
+  expiresAt DateTime 
+  isPublic Boolean  @default(true)
+}
 
 model Inquiry {
   id        Int      @id @default(autoincrement())
