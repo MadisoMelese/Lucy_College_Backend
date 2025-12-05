@@ -379,7 +379,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Home'
+              $ref: '#/components/schemas/Homepage'
       responses:
         '201':
           description: Created
@@ -477,6 +477,22 @@ paths:
       responses:
         '200':
           description: OK
+
+  /admin/news/category/{category}:
+    get:
+      tags: [Admin]
+      summary: Get news by category (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
   /api/inquiry:
     post:
       tags: [Website]
@@ -507,9 +523,17 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/News'
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                image:
+                  type: string
+                  format: binary
       responses:
         '201':
           description: Created
@@ -710,6 +734,91 @@ paths:
       responses:
         '204':
           description: Deleted
+  /team:
+    get:
+      tags: [Team]
+      summary: List team members (public)
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Team]
+      summary: Create team member (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                bio:
+                  type: string
+                photoUrl:
+                  type: string
+      responses:
+        '201':
+          description: Created
+  /team/{id}:
+    get:
+      tags: [Team]
+      summary: Get team member by id (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags: [Team]
+      summary: Update team member (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                bio:
+                  type: string
+                photoUrl:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [Team]
+      summary: Delete team member (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
 tags:
   - name: Auth
     description: Authentication endpoints
@@ -725,3 +834,5 @@ tags:
     description: Public website endpoints (departments, courses, news, inquiry)
   - name: Admin
     description: Admin panel endpoints (secured)
+  - name: Team
+    description: Team members (public + admin)
