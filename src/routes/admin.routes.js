@@ -1,7 +1,7 @@
 import express from "express";
 import authenticate from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
-
+import { upload } from "../config/multer.js";
 import * as NewsCtrl from "../controllers/admin/news.controller.js";
 import * as DeptCtrl from "../controllers/admin/department.controller.js";
 import * as CourseCtrl from "../controllers/admin/course.controller.js";
@@ -12,11 +12,15 @@ const router = express.Router();
 // require authentication + role for admin routes
 // allow SUPERADMIN and REGISTRAR to manage content; you can adjust roles per resource
 const adminOnly = [ "SUPERADMIN", "REGISTRAR" ];
-
+router.use((req, res, next) => {
+  req.uploadFolder = "news";
+  next();
+});
 // News (CRUD)
 router.get("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.list);
-router.post("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.create);
+router.post("/news", authenticate, roleMiddleware(adminOnly),  upload.single("image"), NewsCtrl.create);
 router.get("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.getOne);
+router.get("/news/category/:category", authenticate, roleMiddleware(adminOnly), NewsCtrl.getNewsByCategory);
 router.put("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.update);
 router.delete("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.remove);
 

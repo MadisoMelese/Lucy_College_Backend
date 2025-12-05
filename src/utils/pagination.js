@@ -4,3 +4,4 @@ export const parsePagination = (req) => {
   const skip = (page - 1) * limit;
   return { page, limit, skip };
 };
+
