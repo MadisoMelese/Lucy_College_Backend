@@ -56,13 +56,7 @@ model Student {
   invoices      Invoice[]
 }
 
-model Department {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  programs  Program[]
-  lecturers Lecturer[]
-  courses   Course[]
-}
+/* department model defined later (keep single consolidated definition) */
 
 model Program {
   id            Int            @id @default(autoincrement())
@@ -91,6 +85,22 @@ model Semester {
   academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
 
   registrations CourseRegistration[]
+}
+
+model Faculty {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  departments Department[]
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  facultyId Int
+  faculty   Faculty    @relation(fields: [facultyId], references: [id])
+  programs  Program[]
+  lecturers Lecturer[]
+  courses   Course[]
 }
 
 model Course {
