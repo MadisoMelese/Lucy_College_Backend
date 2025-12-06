@@ -33,3 +33,12 @@ export const login = async (req, res) => {
     return errorResponse(res, err.message);
   }
 };
+
+export const logout = async (req, res) => {
+  try {
+    return success(res, {}, "Logout successful");
+  } catch (err) {
+    return errorResponse(res, err.message);
+  }
+}
+

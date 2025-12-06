@@ -27,3 +27,5 @@ export const createAccessToken = (user) => {
   const payload = { id: user.id, email: user.email, role: user.role };
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
+
+
