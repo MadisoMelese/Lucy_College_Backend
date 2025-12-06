@@ -283,3 +283,12 @@ model TeamMember {
   updatedAt  DateTime @updatedAt
 }
 
+// Token blacklist for server-side token revocation (refresh or access tokens)
+model BlacklistedToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+

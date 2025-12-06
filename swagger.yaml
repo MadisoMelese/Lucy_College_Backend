@@ -155,6 +155,31 @@ paths:
           description: OK
         '401':
           description: Unauthorized
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout (end session)
+      description: Invalidate the current session/token. This endpoint requires a valid Bearer token in the `Authorization` header.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: >-
+            Bearer token. Example: `Bearer eyJ...` — include the token returned by `/auth/login`.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
   /about:
     get:
       tags: [About]
