@@ -116,7 +116,7 @@ await prisma.newsEvent.createMany({
     },
   ],
   skipDuplicates: true, // skip if already exists
-});
+}); 
 
   // ----------------------
   // About (single entry)
@@ -146,7 +146,7 @@ await prisma.newsEvent.createMany({
         {
           title: "Welcome to Lucy College",
           subtitle: "Learn. Grow. Succeed.",
-          imageUrl: "http://localhost:3000/uploads/hero/hero1.jpg",
+          imageUrl: "http://localhost:3000/uploads/hero/teamwork.jpg",
           ctaText: "Apply Now",
           ctaUrl: "/apply",
           order: 0,
