@@ -558,6 +558,13 @@ paths:
                   type: string
                 category: 
                   type: string
+                publishedAt:
+                  type: string
+                  format: date-time
+                  description: Optional scheduled publish datetime (ISO 8601)
+                isPublic:
+                  type: boolean
+                  description: Whether the news is public (default true)
                 image:
                   type: string
                   format: binary
@@ -586,7 +593,7 @@ paths:
         - bearerAuth: []
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/News'
       responses:

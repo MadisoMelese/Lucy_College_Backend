@@ -7,24 +7,45 @@ async function main() {
   console.log("Seeding database...");
 
   // ----------------------
+  // Faculties (ensure required relation exists)
+  // ----------------------
+  const techFaculty = await prisma.faculty.upsert({
+    where: { name: "Technology" },
+    update: {},
+    create: { name: "Technology" },
+  });
+
+  const medFaculty = await prisma.faculty.upsert({
+    where: { name: "Medical Sciences" },
+    update: {},
+    create: { name: "Medical Sciences" },
+  });
+
+  const busFaculty = await prisma.faculty.upsert({
+    where: { name: "Business Administration" },
+    update: {},
+    create: { name: "Business Administration" },
+  });
+
+  // ----------------------
   // Departments
   // ----------------------
   const csDept = await prisma.department.upsert({
     where: { name: "Computer Science" },
     update: {},
-    create: { name: "Computer Science" },
+    create: { name: "Computer Science", facultyId: techFaculty.id },
   });
 
   const eeDept = await prisma.department.upsert({
     where: { name: "Electrical Engineering" },
     update: {},
-    create: { name: "Electrical Engineering" },
+    create: { name: "Electrical Engineering", facultyId: techFaculty.id },
   });
 
   // ----------------------
   // Programs
   // ----------------------
-   prisma.program.upsert({
+   await prisma.program.upsert({
     where: { name: "BSc Computer Science" },
     update: {},
     create: {

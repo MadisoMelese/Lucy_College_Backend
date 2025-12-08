@@ -55,8 +55,7 @@ model Student {
   payments      Payment[]
   invoices      Invoice[]
 }
-
-/* department model defined later (keep single consolidated definition) */
+// department model defined later (keep single consolidated definition) 
 
 model Program {
   id            Int            @id @default(autoincrement())
@@ -188,6 +187,7 @@ model NewsEvent {
   imageUrl  String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
+  publishedAt DateTime   @default(now())
   expiresAt     DateTime?
   category String
   isPublic Boolean  @default(true)
