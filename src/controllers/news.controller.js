@@ -45,11 +45,17 @@ export const getByCategory = async (req, res) => {
       skip,
       limit
     );
-
+    const processedItems = items.map(item => {
+      // item.imageUrl is now String[]
+      if (item.imageUrl && item.imageUrl.length > 0) {
+        item.imageUrl = item.imageUrl.map(filePath => fileUrl(req, filePath));
+      }
+      return item;
+    });
     const totalPages = Math.ceil(total / limit);
 
     return success(res, {
-      items,
+      processedItems,
       meta: {
         total,
         limit,
