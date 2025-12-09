@@ -184,7 +184,7 @@ model NewsEvent {
   id       Int      @id @default(autoincrement())
   title    String
   content  String
-  imageUrl  String?
+  imageUrl  String[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now())
   publishedAt DateTime   @default(now())

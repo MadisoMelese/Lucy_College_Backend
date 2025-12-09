@@ -18,7 +18,7 @@ router.use((req, res, next) => {
 });
 // News (CRUD)
 router.get("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.list);
-router.post("/news", authenticate, roleMiddleware(adminOnly),  upload.single("image"), NewsCtrl.create);
+router.post("/news", authenticate, roleMiddleware(adminOnly),  upload.array('images', 10), NewsCtrl.create);
 router.get("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.getOne);
 router.get("/news/category/:category", authenticate, roleMiddleware(adminOnly), NewsCtrl.getNewsByCategory);
 router.put("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.update);

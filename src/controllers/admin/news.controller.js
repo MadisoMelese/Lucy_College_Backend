@@ -34,7 +34,17 @@ export const list = async (req, res) => {
       prisma.newsEvent.count(),
     ]);
 
-    return success(res, { items, total, page });
+    // 💡 Map over the fetched items to process the imageUrls array
+    const processedItems = items.map(item => {
+      // item.imageUrl is now String[]
+      if (item.imageUrl && item.imageUrl.length > 0) {
+        // Map each path in the array to its full public URL
+        item.imageUrl = item.imageUrl.map(filePath => fileUrl(req, filePath));
+      }
+      return item;
+    });
+
+    return success(res, { items: processedItems, total, page });
   } catch (err) {
     return errorResponse(res, err.message);
   }
@@ -78,24 +88,26 @@ export const create = async (req, res) => {
       }
     }
 
-    let imageUrl = undefined;
-    if (req.file) {
-      const filePath = path.posix.join("news", req.file.filename);
-      imageUrl = fileUrl(req, filePath);
-    }
+let imageUrls = []; 
+if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    imageUrls = req.files.map((file) => {
+        return path.posix.join("news", file.filename); 
+    });
+}
 
-    const data = {
-      title,
-      content,
-      category,
-      ...(req.body.isPublic !== undefined ? { isPublic: isPublicValue } : {}),
-      ...(publishedAt ? { publishedAt } : {}),
-      ...(imageUrl ? { imageUrl } : {}),
-    };
+const data = {
+    title,
+    content,
+    category,
+    ...(req.body.isPublic !== undefined ? { isPublic: isPublicValue } : {}),
+    ...(publishedAt ? { publishedAt } : {}),
+    // Change imageUrl to imageUrls and ensure it's only included if the array is not empty
+    ...(imageUrls.length > 0 ? { imageUrl: imageUrls } : {}),
+};
 
-    const item = await prisma.newsEvent.create({ data });
+const item = await prisma.newsEvent.create({ data });
 
-    return created(res, item, "News created");
+return created(res, item, "News created");
   } catch (err) {
     return errorResponse(res, err.message);
   }
@@ -108,6 +120,11 @@ export const getOne = async (req, res) => {
     const item = await prisma.newsEvent.findUnique({ where: { id } });
 
     if (!item) return errorResponse(res, "Not found", 404);
+
+    // 💡 Process the single item's imageUrl array
+if (item.imageUrl && item.imageUrl.length > 0) {
+    item.imageUrl = item.imageUrl.map(filePath => fileUrl(req, filePath));
+}
 
     return success(res, item);
   } catch (err) {
@@ -173,12 +190,14 @@ export const update = async (req, res) => {
       updateData.publishedAt = parsed;
     }
 
-    // image upload -> set imageUrl (use posix join)
-    if (req.file) {
-      req.uploadFolder = "news";
-      const filePath = path.posix.join("news", req.file.filename);
-      updateData.imageUrl = fileUrl(req, filePath);
-    }
+    // image upload handling
+if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const newImageUrls = req.files.map((file) => {
+        const filePath = path.posix.join("news", file.filename);
+        return fileUrl(req, filePath);
+    });
+    updateData.imageUrl = newImageUrls; 
+}
 
     if (Object.keys(updateData).length === 0)
       return errorResponse(res, "No updatable fields provided", 400);
