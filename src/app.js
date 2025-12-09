@@ -41,6 +41,7 @@ app.use(limiter);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/uploads", express.static(path.resolve("uploads")));
+app.use('/uploads', express.static(path.join(process.cwd(), 'src', 'uploads')));
 // public health
 app.get("/", (req, res) => res.json({ status: "success", message: "Lucy College API is running" }));
 
