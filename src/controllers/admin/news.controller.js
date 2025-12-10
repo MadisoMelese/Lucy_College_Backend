@@ -3,23 +3,25 @@ import { success, created, errorResponse } from "../../utils/apiResponse.js";
 import { parsePagination } from "../../utils/pagination.js";
 import { fileUrl } from "../../utils/fileUrl.js";
 import path from "path";
-import fs from "fs/promises"; // 💡 NEW: Import fs/promises for file deletion
-
-// 💡 NEW: Define the base upload path for file deletion
+import fs from "fs/promises"; 
+import { Prisma } from "@prisma/client";
 const uploadRoot = path.resolve("src/uploads"); 
-
 
 const newsModelHasPublishedAt = (() => {
   try {
-    const model = prisma._dmmf?.modelMap?.NewsEvent;
-    if (!model || !Array.isArray(model.fields)) return false;
+    const model = Prisma.dmmf.datamodel.models.find(
+      (m) => m.name === "NewsEvent"
+    );
+    console.log("model", model)
+
+    if (!model) return false;
+
     return model.fields.some((f) => f.name === "publishedAt");
   } catch (err) {
     return false;
   }
 })();
 
-// --- LIST FUNCTION ---
 export const list = async (req, res) => {
   try {
     const { limit, skip, page } = parsePagination(req);
@@ -33,7 +35,6 @@ export const list = async (req, res) => {
       prisma.newsEvent.count(),
     ]);
 
-    // ✅ CORRECT: Convert relative paths to full URLs for the response
     const processedItems = items.map((item) => {
       if (item.imageUrl && item.imageUrl.length > 0) {
         item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
@@ -47,15 +48,11 @@ export const list = async (req, res) => {
   }
 };
 
-// --- CREATE FUNCTION ---
 export const create = async (req, res) => {
   try {
     const { title, content, category } = req.body;
-
     if (!title || !content || !category)
       return errorResponse(res, "title, content & category required", 400);
-
-    // ... (publishedAt and isPublic parsing logic is correct) ...
     let publishedAt;
     if (req.body.publishedAt !== undefined && req.body.publishedAt !== "") {
       if (!newsModelHasPublishedAt) {
@@ -75,7 +72,6 @@ export const create = async (req, res) => {
       }
       publishedAt = parsed;
     }
-
     let isPublicValue;
     if (req.body.isPublic !== undefined) {
       const raw = req.body.isPublic;
@@ -85,15 +81,12 @@ export const create = async (req, res) => {
         isPublicValue = Boolean(raw);
       }
     }
-
-    // ✅ CORRECT: Store only relative paths
     let imageUrls = [];
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       imageUrls = req.files.map((file) => {
         return path.posix.join("news", file.filename);
       });
     }
-
     const data = {
       title,
       content,
@@ -102,30 +95,21 @@ export const create = async (req, res) => {
       ...(publishedAt ? { publishedAt } : {}),
       ...(imageUrls.length > 0 ? { imageUrl: imageUrls } : {}),
     };
-
     let item = await prisma.newsEvent.create({ data });
-
-    // 💡 FIX: Convert relative paths to full URLs for the creation response
     if (item.imageUrl && item.imageUrl.length > 0) {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
-
     return created(res, item, "News created");
   } catch (err) {
     return errorResponse(res, err.message);
   }
 };
 
-// --- GET ONE FUNCTION ---
 export const getOne = async (req, res) => {
   try {
     const id = Number(req.params.id);
-
     const item = await prisma.newsEvent.findUnique({ where: { id } });
-
     if (!item) return errorResponse(res, "Not found", 404);
-
-    // ✅ CORRECT: Convert relative paths to full URLs for the response
     if (item.imageUrl && item.imageUrl.length > 0) {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
@@ -136,7 +120,6 @@ export const getOne = async (req, res) => {
   }
 };
 
-// --- GET BY CATEGORY FUNCTION ---
 export const getNewsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
@@ -151,7 +134,6 @@ export const getNewsByCategory = async (req, res) => {
       prisma.newsEvent.count({ where: { category } }),
     ]);
 
-    // 💡 FIX: Convert relative paths to full URLs for the response
     const processedItems = items.map((item) => {
       if (item.imageUrl && item.imageUrl.length > 0) {
         item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
@@ -165,7 +147,6 @@ export const getNewsByCategory = async (req, res) => {
   }
 };
 
-// --- UPDATE FUNCTION ---
 export const update = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -201,13 +182,40 @@ export const update = async (req, res) => {
       }
     }
 
-    // ✅ CORRECT: Store only relative paths for image replacement
+    // 💡 NEW LOGIC: Pre-fetch the existing item to get the current image array
+    let existingItem = await prisma.newsEvent.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    if (!existingItem) return errorResponse(res, "News item not found", 404);
+
+    let existingImageUrls = existingItem.imageUrl || [];
+    let updatedImageUrls = [...existingImageUrls]; // Start with current URLs
+
+    // 🖼️ MULTI-IMAGE UPLOAD HANDLING (APPEND LOGIC)
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const newImageUrls = req.files.map((file) => {
+        // Store only the RELATIVE PATH
         return path.posix.join("news", file.filename);
       });
-      updateData.imageUrl = newImageUrls;
+
+      // ✅ APPEND FIX: Combine existing URLs with the new ones
+      updatedImageUrls = [...existingImageUrls, ...newImageUrls];
     }
+    
+    // 💡 NEW LOGIC: Allow explicit clearing of images without new uploads
+    // If the client sends a body field indicating to clear images (e.g., clear_images: true)
+    if (req.body.clear_images === 'true') {
+        updatedImageUrls = [];
+        // Note: You would need separate logic here (or in another endpoint) 
+        // to delete the physical files from the server!
+    }
+
+    // Only update the database field if the array actually changed (i.e., new files were uploaded)
+    // We update it regardless to simplify the explicit clear logic above.
+    updateData.imageUrl = updatedImageUrls;
+
 
     if (Object.keys(updateData).length === 0)
       return errorResponse(res, "No updatable fields provided", 400);
@@ -217,7 +225,6 @@ export const update = async (req, res) => {
       data: updateData,
     });
 
-    // ✅ CORRECT: Convert relative paths to full URLs for the update response
     if (item.imageUrl && item.imageUrl.length > 0) {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
@@ -228,43 +235,33 @@ export const update = async (req, res) => {
   }
 };
 
-// --- REMOVE FUNCTION ---
 export const remove = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    // 1. Fetch the item to get the file paths before deletion
     const itemToDelete = await prisma.newsEvent.findUnique({
       where: { id },
-      select: { imageUrl: true }, // Only retrieve the imageUrl field
+      select: { imageUrl: true }, 
     });
 
     if (!itemToDelete) {
       return errorResponse(res, "News item not found", 404);
     }
 
-    // 2. Delete the database record
     await prisma.newsEvent.delete({ where: { id } });
 
-    // 3. Delete the physical files ⚠️ CRITICAL FIX ⚠️
     if (itemToDelete.imageUrl && itemToDelete.imageUrl.length > 0) {
       const deletionPromises = itemToDelete.imageUrl.map(async (relativePath) => {
-        // Construct the absolute path: uploadRoot/news/filename.jpg
         const absolutePath = path.join(uploadRoot, relativePath);
 
         try {
-          // Asynchronously delete the file
           await fs.unlink(absolutePath);
         } catch (fileError) {
-          // Log error but continue (to delete other files)
           console.error(`Failed to delete file ${absolutePath}:`, fileError.message);
         }
       });
-      
-      // Wait for all file deletion operations to complete
       await Promise.all(deletionPromises);
     }
-
     return success(res, null, "Deleted");
   } catch (err) {
     return errorResponse(res, err.message);
