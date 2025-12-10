@@ -182,27 +182,62 @@ export const update = async (req, res) => {
       }
     }
 
-    let existingItem = await prisma.newsEvent.findUnique({
+    const existingItem = await prisma.newsEvent.findUnique({
       where: { id },
       select: { imageUrl: true },
     });
+
     if (!existingItem) return errorResponse(res, "News item not found", 404);
-    let existingImageUrls = existingItem.imageUrl || [];
-    let updatedImageUrls = [...existingImageUrls];
+    const existingImageUrls = existingItem.imageUrl || [];
+    let updatedImageUrls = existingImageUrls;
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const newImageUrls = req.files.map((file) => {
         return path.posix.join("news", file.filename);
       });
-      updatedImageUrls = [...existingImageUrls, ...newImageUrls];
+
+      if (req.body.replace_images === "true") {
+        const deletionPromises = existingImageUrls.map(async (relativePath) => {
+          const absolutePath = path.join(uploadRoot, relativePath);
+          try {
+            await fs.unlink(absolutePath);
+          } catch (fileError) {
+            console.error(
+              `Failed to delete old file ${absolutePath}:`,
+              fileError.message
+            );
+          }
+        });
+        await Promise.all(deletionPromises);
+
+        updatedImageUrls = newImageUrls;
+      } else {
+        updatedImageUrls = [...existingImageUrls, ...newImageUrls];
+      }
     }
+
     if (req.body.clear_images === "true") {
+      const deletionPromises = updatedImageUrls.map(async (relativePath) => {
+        const absolutePath = path.join(uploadRoot, relativePath);
+        try {
+          await fs.unlink(absolutePath);
+        } catch (fileError) {
+          console.error(
+            `Failed to delete cleared file ${absolutePath}:`,
+            fileError.message
+          );
+        }
+      });
+      await Promise.all(deletionPromises);
+
       updatedImageUrls = [];
     }
+
     updateData.imageUrl = updatedImageUrls;
+
     if (Object.keys(updateData).length === 0)
       return errorResponse(res, "No updatable fields provided", 400);
 
-    let item = await prisma.newsEvent.update({
+    const item = await prisma.newsEvent.update({
       where: { id },
       data: updateData,
     });
@@ -210,6 +245,7 @@ export const update = async (req, res) => {
     if (item.imageUrl && item.imageUrl.length > 0) {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
+
     return success(res, item, "Updated");
   } catch (err) {
     return errorResponse(res, err.message);
