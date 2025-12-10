@@ -3,16 +3,16 @@ import { success, created, errorResponse } from "../../utils/apiResponse.js";
 import { parsePagination } from "../../utils/pagination.js";
 import { fileUrl } from "../../utils/fileUrl.js";
 import path from "path";
-import fs from "fs/promises"; 
+import fs from "fs/promises";
 import { Prisma } from "@prisma/client";
-const uploadRoot = path.resolve("src/uploads"); 
+const uploadRoot = path.resolve("src/uploads");
 
 const newsModelHasPublishedAt = (() => {
   try {
     const model = Prisma.dmmf.datamodel.models.find(
       (m) => m.name === "NewsEvent"
     );
-    console.log("model", model)
+    console.log("model", model);
 
     if (!model) return false;
 
@@ -186,29 +186,19 @@ export const update = async (req, res) => {
       where: { id },
       select: { imageUrl: true },
     });
-
     if (!existingItem) return errorResponse(res, "News item not found", 404);
-
     let existingImageUrls = existingItem.imageUrl || [];
-    let updatedImageUrls = [...existingImageUrls]; // Start with current URLs
-
+    let updatedImageUrls = [...existingImageUrls];
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const newImageUrls = req.files.map((file) => {
         return path.posix.join("news", file.filename);
       });
-
       updatedImageUrls = [...existingImageUrls, ...newImageUrls];
     }
-    
-    if (req.body.clear_images === 'true') {
-        updatedImageUrls = [];
-
+    if (req.body.clear_images === "true") {
+      updatedImageUrls = [];
     }
-
-    
     updateData.imageUrl = updatedImageUrls;
-
-
     if (Object.keys(updateData).length === 0)
       return errorResponse(res, "No updatable fields provided", 400);
 
@@ -220,7 +210,6 @@ export const update = async (req, res) => {
     if (item.imageUrl && item.imageUrl.length > 0) {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
-
     return success(res, item, "Updated");
   } catch (err) {
     return errorResponse(res, err.message);
@@ -230,28 +219,31 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const id = Number(req.params.id);
-
     const itemToDelete = await prisma.newsEvent.findUnique({
       where: { id },
-      select: { imageUrl: true }, 
+      select: { imageUrl: true },
     });
-
     if (!itemToDelete) {
       return errorResponse(res, "News item not found", 404);
     }
-
     await prisma.newsEvent.delete({ where: { id } });
-
     if (itemToDelete.imageUrl && itemToDelete.imageUrl.length > 0) {
-      const deletionPromises = itemToDelete.imageUrl.map(async (relativePath) => {
-        const absolutePath = path.join(uploadRoot, relativePath);
+      const deletionPromises = itemToDelete.imageUrl.map(
+        async (relativePath) => {
+          const absolutePath = path.join(uploadRoot, relativePath);
 
-        try {
-          await fs.unlink(absolutePath);
-        } catch (fileError) {
-          console.error(`Failed to delete file ${absolutePath}:`, fileError.message);
+          try {
+            await fs.unlink(absolutePath);
+          } catch (fileError) {
+            // Continue deleting other files even if one fails
+            console.error(
+              `Failed to delete file ${absolutePath}:`,
+              fileError.message
+            );
+            errorResponse(res, `Failed to delete file ${absolutePath}`);
+          }
         }
-      });
+      );
       await Promise.all(deletionPromises);
     }
     return success(res, null, "Deleted");
