@@ -10,7 +10,7 @@ export const list = async (req, res) => {
         skip,
         take: limit,
         include: { departments: true },
-        orderBy: { name: 'asc' }
+        orderBy: { name: "asc" },
       }),
       prisma.faculty.count(),
     ]);
@@ -25,14 +25,14 @@ export const create = async (req, res) => {
     const { name } = req.body;
     if (!name) return errorResponse(res, "Name is required", 400);
 
-    const faculty = await prisma.faculty.create({ 
+    const faculty = await prisma.faculty.create({
       data: { name },
     });
     return created(res, faculty, "Faculty created");
   } catch (err) {
     if (err.code === "P2002")
       return errorResponse(res, "Faculty name must be unique", 409);
-      
+
     return errorResponse(res, err.message);
   }
 };
@@ -42,7 +42,7 @@ export const getOne = async (req, res) => {
     const id = Number(req.params.id);
     const faculty = await prisma.faculty.findUnique({
       where: { id },
-      include: { departments: true }, 
+      include: { departments: true },
     });
     if (!faculty) return errorResponse(res, "Not found", 404);
     return success(res, faculty);
@@ -55,7 +55,7 @@ export const update = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { name } = req.body;
-    
+
     if (!name) return errorResponse(res, "Name is required for update", 400);
 
     const faculty = await prisma.faculty.update({
@@ -66,8 +66,8 @@ export const update = async (req, res) => {
   } catch (err) {
     if (err.code === "P2002")
       return errorResponse(res, "Faculty name must be unique", 409);
-    if (err.code === "P2025") 
-        return errorResponse(res, "Faculty not found", 404);
+    if (err.code === "P2025")
+      return errorResponse(res, "Faculty not found", 404);
 
     return errorResponse(res, err.message);
   }
@@ -79,12 +79,16 @@ export const remove = async (req, res) => {
     await prisma.faculty.delete({ where: { id } });
     return success(res, null, "Deleted");
   } catch (err) {
-    if (err.code === "P2025") 
-        return errorResponse(res, "Faculty not found", 404);
-   
+    if (err.code === "P2025")
+      return errorResponse(res, "Faculty not found", 404);
+
     if (err.code === "P2003")
-        return errorResponse(res, "Cannot delete faculty while it has associated departments.", 409);
-        
+      return errorResponse(
+        res,
+        "Cannot delete faculty while it has associated departments.",
+        409
+      );
+
     return errorResponse(res, err.message);
   }
 };
