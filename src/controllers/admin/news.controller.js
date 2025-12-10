@@ -182,7 +182,6 @@ export const update = async (req, res) => {
       }
     }
 
-    // 💡 NEW LOGIC: Pre-fetch the existing item to get the current image array
     let existingItem = await prisma.newsEvent.findUnique({
       where: { id },
       select: { imageUrl: true },
@@ -193,27 +192,20 @@ export const update = async (req, res) => {
     let existingImageUrls = existingItem.imageUrl || [];
     let updatedImageUrls = [...existingImageUrls]; // Start with current URLs
 
-    // 🖼️ MULTI-IMAGE UPLOAD HANDLING (APPEND LOGIC)
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       const newImageUrls = req.files.map((file) => {
-        // Store only the RELATIVE PATH
         return path.posix.join("news", file.filename);
       });
 
-      // ✅ APPEND FIX: Combine existing URLs with the new ones
       updatedImageUrls = [...existingImageUrls, ...newImageUrls];
     }
     
-    // 💡 NEW LOGIC: Allow explicit clearing of images without new uploads
-    // If the client sends a body field indicating to clear images (e.g., clear_images: true)
     if (req.body.clear_images === 'true') {
         updatedImageUrls = [];
-        // Note: You would need separate logic here (or in another endpoint) 
-        // to delete the physical files from the server!
+
     }
 
-    // Only update the database field if the array actually changed (i.e., new files were uploaded)
-    // We update it regardless to simplify the explicit clear logic above.
+    
     updateData.imageUrl = updatedImageUrls;
 
 
