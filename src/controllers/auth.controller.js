@@ -36,17 +36,14 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    // When logout is called, blacklist the current access token so it cannot be used again.
-    // Token is expected in Authorization header (middleware `authenticate` provides req.user).
+
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return errorResponse(res, "Authorization header missing", 401);
     }
     const token = authHeader.split(" ")[1];
 
-    // req.user should be populated by `authenticate` middleware with payload containing `exp`.
     const payload = req.user;
-    // If payload.exp is set, convert to milliseconds
     const expiresAt = payload && payload.exp ? new Date(payload.exp * 1000) : new Date(Date.now());
 
     await AuthService.blacklistToken(token, expiresAt);

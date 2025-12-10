@@ -7,7 +7,6 @@ const server = app.listen(PORT, () => {
   console.log(`swagger file running on http://localhost:${PORT}/docs`)
 });
 
-// prisma shutdown handler
 const shutdown = async () => {
   console.log("Shutting down server...");
   server.close(async () => {
@@ -16,7 +15,6 @@ const shutdown = async () => {
     process.exit(0);
   });
 
-  // Force exit after 10s
   setTimeout(() => {
     console.error("Forcing shutdown.");
     process.exit(1);

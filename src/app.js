@@ -23,7 +23,6 @@ import notFound from "./middlewares/notFound.js";
 
 const app = express();
 
-// security + perf
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
@@ -34,7 +33,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// basic rate limiter
 const limiter = rateLimit({
   windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000),
   max: Number(process.env.RATE_LIMIT_MAX || 100),
@@ -47,18 +45,14 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/uploads", express.static(path.resolve("uploads")));
 app.use("/uploads", express.static(path.join(process.cwd(), "src", "uploads")));
 
-// public health
 app.get("/", (req, res) =>
   res.json({ status: "success", message: "Lucy College API is running" })
 );
 
-// public website routes (no auth)
 app.use("/api", websiteRoutes);
 
-// auth routes
 app.use("/auth", authRoutes);
 
-// admin routes (authenticated + role middleware applied inside)
 app.use("/admin", adminRoutes);
 app.use("/about", aboutRoutes);
 
@@ -67,7 +61,6 @@ app.use("/home", homepageRoutes);
 app.use("/team", teamRoutes);
 app.use("/gallery", galleryRoutes);
 
-// 404 + error handling
 app.use(notFound);
 app.use(errorHandler);
 

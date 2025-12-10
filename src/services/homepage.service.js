@@ -2,7 +2,6 @@ import prisma from "../config/database.js";
 
 export const HomepageService = {
   async getOne() {
-    // We expect only one homepage row — get first
     return prisma.homepage.findFirst();
   },
 
