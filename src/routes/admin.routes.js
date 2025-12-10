@@ -6,7 +6,7 @@ import * as NewsCtrl from "../controllers/admin/news.controller.js";
 import * as DeptCtrl from "../controllers/admin/department.controller.js";
 import * as CourseCtrl from "../controllers/admin/course.controller.js";
 import * as InquiryCtrl from "../controllers/admin/inquiry.controller.js";
-
+import * as FacultyCtrl from '../controllers/admin/faculty.controller.js';
 const router = express.Router();
 
 // require authentication + role for admin routes
@@ -23,6 +23,12 @@ router.get("/news/category/:category", authenticate, roleMiddleware(adminOnly), 
 router.put("/news/:id", authenticate, roleMiddleware(adminOnly), upload.array('images', 10), NewsCtrl.update);
 router.delete("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.remove);
 
+// faculties
+router.get("/faculties", authenticate, roleMiddleware(adminOnly), FacultyCtrl.list);
+router.post("/faculties", authenticate, roleMiddleware(adminOnly), FacultyCtrl.create);
+router.get("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.getOne);
+router.put("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.update);
+router.delete("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.remove);
 // Departments
 router.get("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
 router.post("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.create);

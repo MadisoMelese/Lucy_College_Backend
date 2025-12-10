@@ -3,9 +3,13 @@ import * as DepartmentController from "../controllers/department.controller.js";
 import * as CourseController from "../controllers/course.controller.js";
 import * as NewsController from "../controllers/news.controller.js";
 import * as InquiryController from "../controllers/inquiry.controller.js";
+import * as FacultyController from "../controllers/admin/faculty.controller.js";
 
 const router = express.Router();
 
+// Faculties
+router.get("/faculties", FacultyController.list);
+router.get("/faculties/:id", FacultyController.getOne);
 // Departments
 router.get("/departments", DepartmentController.getAll);
 router.get("/departments/:id", DepartmentController.getOne);
