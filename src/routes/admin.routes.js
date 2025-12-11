@@ -26,15 +26,15 @@ router.delete("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.rem
 // faculties
 router.get("/faculties", authenticate, roleMiddleware(adminOnly), FacultyCtrl.list);
 router.post("/faculties", authenticate, roleMiddleware(adminOnly), FacultyCtrl.create);
-router.get("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.getOne);
-router.put("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.update);
-router.delete("/faculties/:id", authenticate, roleMiddleware(adminOnly), FacultyCtrl.remove);
+router.get("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), FacultyCtrl.getOne);
+router.put("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), FacultyCtrl.update);
+router.delete("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), FacultyCtrl.remove);
 // Departments
 router.get("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
 router.post("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.create);
-router.get("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
-router.put("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.update);
-router.delete("/departments/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
+router.get("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
+router.put("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.update);
+router.delete("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
 
 // Courses
 router.get("/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.list);

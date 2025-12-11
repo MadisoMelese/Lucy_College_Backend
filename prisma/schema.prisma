@@ -89,14 +89,16 @@ model Semester {
 model Faculty {
   id        Int     @id @default(autoincrement())
   name      String  @unique
+  facultyCode        String    @unique
   departments Department[]
 }
 
 model Department {
   id        Int        @id @default(autoincrement())
   name      String     @unique
-  facultyId Int
-  faculty   Faculty    @relation(fields: [facultyId], references: [id])
+  departmentCode  String    @unique 
+  facultyCode     String 
+  faculty         Faculty   @relation(fields: [facultyCode], references: [facultyCode])
   programs  Program[]
   lecturers Lecturer[]
   courses   Course[]
