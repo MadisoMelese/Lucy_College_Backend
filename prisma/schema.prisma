@@ -218,9 +218,15 @@ model Inquiry {
 model Lecturer {
   id           Int     @id @default(autoincrement())
   userId       Int     @unique
+  firstName      String
+  middleName     String?
+  lastName       String
   departmentId Int
   title        String? // Ms., Dr., Prof. etc.
-
+  bio          String?
+  imageUrl     String? 
+  phone        String?
+  isActive     Boolean @default(true)
   user       User       @relation(fields: [userId], references: [id])
   department Department @relation(fields: [departmentId], references: [id])
 }
