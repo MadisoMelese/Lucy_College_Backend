@@ -12,7 +12,6 @@ const newsModelHasPublishedAt = (() => {
     const model = Prisma.dmmf.datamodel.models.find(
       (m) => m.name === "NewsEvent"
     );
-    console.log("model", model);
 
     if (!model) return false;
 
