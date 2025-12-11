@@ -37,11 +37,11 @@ router.put("/departments/:departmentCode", authenticate, roleMiddleware(adminOnl
 router.delete("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
 
 // Courses
-router.get("/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.list);
-router.post("/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.create);
-router.get("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.getOne);
-router.put("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.update);
-router.delete("/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
+router.get("/:facultyCode/:departmentCode/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.list);
+router.post("/:facultyCode/:departmentCode/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.create);
+router.get("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.getOne);
+router.put("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.update);
+router.delete("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
 
 // Inquiries
 router.get("/inquiries", authenticate, roleMiddleware(adminOnly), InquiryCtrl.list);
