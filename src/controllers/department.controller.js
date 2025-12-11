@@ -7,7 +7,7 @@ export const getAll = async (req, res) => {
     return success(res, departments);
   } catch (err) {
     return errorResponse(res, err.message);
-  }
+  } 
 };
 
 export const getOne = async (req, res) => {
