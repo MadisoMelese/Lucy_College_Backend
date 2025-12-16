@@ -143,11 +143,11 @@ export const createDepartment = async (
     data: {
       name,
       departmentCode: finalDepartmentCode,
-      description, // <--- NEW
-      headImage: headImagePath, // <--- NEW
-      headFullname, // <--- NEW
-      headEducationLevel, // <--- NEW
-      headMessage, // <--- NEW
+      description,
+      headImage: headImagePath,
+      headFullname,
+      headEducationLevel,
+      headMessage,
       facultyCode: facultyCode.toUpperCase(),
     },
     include: { faculty: true },
@@ -176,8 +176,6 @@ export const updateDepartment = async (existingDepartmentCode, updateData) => {
   if (updateData.departmentCode) {
     updateData.departmentCode = updateData.departmentCode.toUpperCase();
   }
-
-  // Prisma handles all the other fields (headImage, headFullname, etc.) passed in updateData
 
   const dep = await prisma.department.update({
     where: { departmentCode: existingDepartmentCode.toUpperCase() },

@@ -50,7 +50,6 @@ export const getOne = async (req, res) => {
   }
 };
 
-// --- CREATE: Handle file and extra fields
 export const create = async (req, res) => {
   // Get file info from Multer
   const headImageFile = req.files?.headImage?.[0] || req.file;
@@ -92,7 +91,6 @@ export const create = async (req, res) => {
 
     return created(res, dep, "Department created");
   } catch (err) {
-    // Cleanup file on error
     if (headImageFile) {
       const absolutePath = path.join(
         uploadRoot,
@@ -120,10 +118,8 @@ export const create = async (req, res) => {
   }
 };
 
-// --- UPDATE: Handle file upload, replacement, and clearing
 export const update = async (req, res) => {
   const existingDepartmentCode = req.params.departmentCode;
-  // Get file info from Multer
   const headImageFile = req.files?.headImage?.[0] || req.file;
 
   try {
@@ -135,11 +131,10 @@ export const update = async (req, res) => {
       headFullname,
       headEducationLevel,
       headMessage,
-      clear_headImage, // New field to signal clearing the image
-      replace_headImage, // New field to signal replacing the image
+      clear_headImage,
+      replace_headImage,
     } = req.body;
 
-    // Initialize update data
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (facultyCode !== undefined) updateData.facultyCode = facultyCode;
@@ -151,7 +146,6 @@ export const update = async (req, res) => {
       updateData.headEducationLevel = headEducationLevel;
     if (headMessage !== undefined) updateData.headMessage = headMessage;
 
-    // Fetch existing department to check image path
     const existingDepartment = await DepartmentService.findDepartmentByCode(
       existingDepartmentCode
     );
@@ -160,9 +154,7 @@ export const update = async (req, res) => {
 
     let existingImagePath = existingDepartment.headImage;
 
-    // Logic for clearing or replacing the image (same as faculty update)
     if (clear_headImage === "true" && existingImagePath) {
-      // Delete the old file from disk
       const absolutePath = path.join(uploadRoot, existingImagePath);
       await fs
         .unlink(absolutePath)
@@ -180,7 +172,6 @@ export const update = async (req, res) => {
       );
 
       if (replace_headImage === "true" && existingImagePath) {
-        // Delete the old file from disk if replacing
         const absolutePath = path.join(uploadRoot, existingImagePath);
         await fs
           .unlink(absolutePath)
@@ -191,7 +182,6 @@ export const update = async (req, res) => {
           );
         updateData.headImage = newRelativePath;
       } else if (!existingImagePath || replace_headImage !== "true") {
-        // Set new image if no existing one, or if not replacing (just adding)
         updateData.headImage = newRelativePath;
       }
     }
@@ -210,7 +200,6 @@ export const update = async (req, res) => {
 
     return success(res, dep, "Updated");
   } catch (err) {
-    // Cleanup file on error
     if (headImageFile) {
       const absolutePath = path.join(
         uploadRoot,
@@ -242,8 +231,6 @@ export const update = async (req, res) => {
   }
 };
 
-// ... (remove route remains the same, but add file deletion logic)
-
 export const remove = async (req, res) => {
   try {
     const departmentCode = req.params.departmentCode;
@@ -256,7 +243,6 @@ export const remove = async (req, res) => {
 
     await DepartmentService.deleteDepartment(departmentCode);
 
-    // Delete the image file on disk
     if (itemToDelete.headImage) {
       const absolutePath = path.join(uploadRoot, itemToDelete.headImage);
       await fs.unlink(absolutePath).catch((fileError) => {
