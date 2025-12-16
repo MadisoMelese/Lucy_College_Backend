@@ -129,8 +129,8 @@ model Course {
   description String?
   tuitionFee  Decimal @default(0.00) @db.Decimal(10, 2)
 
-  departmentId Int
-  department   Department @relation(fields: [departmentId], references: [id])
+  departmentCode String
+  department   Department @relation(fields: [departmentCode], references: [departmentCode])
 
   registrations CourseRegistration[]
 }
@@ -240,14 +240,14 @@ model Lecturer {
   firstName      String
   middleName     String?
   lastName       String
-  departmentId Int
+  departmentCode String 
   title        String? // Ms., Dr., Prof. etc.
   bio          String?
   imageUrl     String? 
   phone        String?
   isActive     Boolean @default(true)
   user       User       @relation(fields: [userId], references: [id])
-  department Department @relation(fields: [departmentId], references: [id])
+  department Department @relation(fields: [departmentCode], references: [departmentCode])
 }
 
 model About {
