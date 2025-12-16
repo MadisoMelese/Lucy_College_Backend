@@ -12,6 +12,7 @@ const router = express.Router();
 // require authentication + role for admin routes
 const adminOnly = [ "SUPERADMIN", "REGISTRAR" ];
 const deanImageUpload = upload.fields([{ name: 'deanImage', maxCount: 1 }]);
+const headImageUpload = upload.fields([{ name: 'headImage', maxCount: 1 }]);
 // router.use((req, res, next) => {
 //   req.uploadFolder = "news";
 //   next();
@@ -25,6 +26,11 @@ const setNewsFolder = (req, res, next) => {
 const setFacultyFolder = (req, res, next) => {
     // This must match the UPLOAD_SUBDIR in your controller
     req.uploadFolder = "faculty_dean"; 
+    next();
+};
+const setDepartmentFolder = (req, res, next) => {
+    // This must match the UPLOAD_SUBDIR in your controller
+    req.uploadFolder = "department_head"; 
     next();
 };
 // News (CRUD)
@@ -43,9 +49,9 @@ router.put("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), s
 router.delete("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), FacultyCtrl.remove);
 // Departments
 router.get("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
-router.post("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.create);
+router.post("/departments", authenticate, roleMiddleware(adminOnly), setDepartmentFolder, headImageUpload, DeptCtrl.create);
 router.get("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
-router.put("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.update);
+router.put("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), setDepartmentFolder, headImageUpload, DeptCtrl.update);
 router.delete("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
 
 // Courses
