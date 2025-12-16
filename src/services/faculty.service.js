@@ -2,16 +2,13 @@ import prisma from "../config/database.js";
 
 const generateDefaultCode = (name) => {
     const words = name.split(/\s+/).filter(w => w.length > 0);
-    let code = '';
+    if (words.length === 0) return "";
     
-    if (words.length >= 4) {
-        code = words[0][0] + words[1][0] + words[3][0];
-    } 
-    else if (words.length > 0) {
-        code = words[0].substring(0, 4);
+    if (words.length > 1) {
+        return (words[0][0] + words[1][0] + (words[2]?.[0] || '')).toUpperCase();
     }
     
-    return code.toUpperCase();
+    return words[0].substring(0, 4).toUpperCase();
 };
 
 export const findFaculties = async (skip, limit) => {
@@ -19,7 +16,7 @@ export const findFaculties = async (skip, limit) => {
         prisma.faculty.findMany({
             skip,
             take: limit,
-            include: { departments: true },
+            include: { _count: { select: { departments: true } } }, 
             orderBy: { name: 'asc' }
         }),
         prisma.faculty.count(),
@@ -35,15 +32,17 @@ export const findFacultyByCode = async (facultyCode) => {
     return faculty;
 };
 
-export const createFaculty = async (name, inputFacultyCode) => {
+export const createFaculty = async (
+    name, 
+    inputFacultyCode, 
+    description,
+    deanImagePath,
+    deanFullname,
+    deanEducationLevel,
+    deanMessage
+) => {
     
-    let finalFacultyCode;
-    
-    if (inputFacultyCode) {
-        finalFacultyCode = inputFacultyCode.toUpperCase();
-    } else {
-        finalFacultyCode = generateDefaultCode(name);
-    }
+    const finalFacultyCode = (inputFacultyCode || generateDefaultCode(name)).toUpperCase();
 
     const existingFaculty = await prisma.faculty.findUnique({
         where: { facultyCode: finalFacultyCode },
@@ -57,7 +56,12 @@ export const createFaculty = async (name, inputFacultyCode) => {
     const newFaculty = await prisma.faculty.create({
         data: { 
             name, 
-            facultyCode: finalFacultyCode
+            facultyCode: finalFacultyCode,
+            description,
+            deanImage: deanImagePath,
+            deanFullname,
+            deanEducationLevel,
+            deanMessage
         },
     });
     return newFaculty;
@@ -71,7 +75,7 @@ export const updateFacultyByCode = async (existingFacultyCode, updateData) => {
     if (updateData.facultyCode) {
         updateData.facultyCode = updateData.facultyCode.toUpperCase();
     }
-
+    
     const faculty = await prisma.faculty.update({
         where: { facultyCode: existingFacultyCode.toUpperCase() },
         data: updateData,

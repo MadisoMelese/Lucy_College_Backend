@@ -287,7 +287,6 @@
 //   }
 // };
 
-
 // *************The code from Adu**********
 import prisma from "../../config/database.js";
 import { success, created, errorResponse } from "../../utils/apiResponse.js";
@@ -296,8 +295,6 @@ import { fileUrl } from "../../utils/fileUrl.js";
 import path from "path";
 import fs from "fs/promises";
 const uploadRoot = path.resolve("src/uploads");
-
-
 
 export const list = async (req, res) => {
   try {
@@ -376,7 +373,6 @@ export const getOne = async (req, res) => {
       item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
     }
 
-
     return success(res, item);
   } catch (err) {
     return errorResponse(res, err.message);
@@ -387,7 +383,6 @@ export const getNewsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
     const { limit, skip, page } = parsePagination(req);
-
 
     const [items, total] = await Promise.all([
       prisma.newsEvent.findMany({
@@ -513,8 +508,6 @@ export const update = async (req, res) => {
     return errorResponse(res, err.message);
   }
 };
-
-
 
 export const remove = async (req, res) => {
   try {
