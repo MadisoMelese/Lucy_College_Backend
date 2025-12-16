@@ -57,15 +57,8 @@ model Student {
 }
 // department model defined later (keep single consolidated definition) 
 
-model Program {
-  id            Int            @id @default(autoincrement())
-  name          String         @unique
-  description   String?
-  durationYears Int            @default(3)
-  departmentId  Int
-  feeStructures FeeStructure[]
-  department    Department     @relation(fields: [departmentId], references: [id])
-}
+
+
 
 // ==========================================================
 // COURSES, SEMESTERS, ACADEMIC YEARS
@@ -73,7 +66,7 @@ model Program {
 
 model AcademicYear {
   id        Int        @id @default(autoincrement())
-  yearLabel String // e.g. "2024/2025"
+  yearLabel String @unique
   semesters Semester[]
 }
 
@@ -87,21 +80,45 @@ model Semester {
 }
 
 model Faculty {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  facultyCode        String    @unique
-  departments Department[]
+  id                  Int           @id @default(autoincrement())
+  name                String        @unique
+  facultyCode         String        @unique 
+  description         String
+
+  deanImage           String?       
+  deanFullname        String?       
+  deanEducationLevel  String?       
+  deanMessage         String?       
+
+  departments         Department[]  
+}
+model Department {
+  id                  Int           @id @default(autoincrement())
+  name                String        @unique
+  departmentCode      String        @unique
+  description         String
+
+  headImage           String?
+  headFullname        String?
+  headEducationLevel  String?
+  headMessage         String?
+
+  facultyCode         String
+  faculty             Faculty       @relation(fields: [facultyCode], references: [facultyCode])
+  programs            Program[]
+  lecturers           Lecturer[]
+  courses             Course[]
 }
 
-model Department {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  departmentCode  String    @unique 
-  facultyCode     String 
-  faculty         Faculty   @relation(fields: [facultyCode], references: [facultyCode])
-  programs  Program[]
-  lecturers Lecturer[]
-  courses   Course[]
+model Program {
+  id                  Int             @id @default(autoincrement())
+  name                String          @unique
+  description         String?
+  durationYears       Int             @default(4)
+  departmentCode      String          // Foreign Key: References Department.departmentCode
+  feeStructures       FeeStructure[]
+
+  department          Department      @relation(fields: [departmentCode], references: [departmentCode])
 }
 
 model Course {

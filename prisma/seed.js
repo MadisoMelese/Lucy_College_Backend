@@ -1,4 +1,3 @@
-// prisma/seed.js
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -7,28 +6,52 @@ async function main() {
     console.log("Seeding database...");
 
     // ----------------------
-    // 1. Faculties (using facultyCode)
+    // 1. Faculties (using facultyCode and new Dean fields)
     // ----------------------
     const techFaculty = await prisma.faculty.upsert({
         where: { facultyCode: "TECH" },
         update: {},
-        create: { name: "Technology", facultyCode: "TECH" },
+        create: { 
+            name: "Technology", 
+            facultyCode: "TECH",
+            description: "Dedicated to advancing technology and engineering sciences.",
+            deanFullname: "Prof. Alan Turing",
+            deanEducationLevel: "PhD",
+            deanMessage: "Welcome to the future of innovation!",
+            deanImage: "http://localhost:3000/uploads/dean/tech_dean.jpg"
+        },
     });
 
     const medFaculty = await prisma.faculty.upsert({
         where: { facultyCode: "MEDI" },
         update: {},
-        create: { name: "Medical Sciences", facultyCode: "MEDI" },
+        create: { 
+            name: "Medical Sciences", 
+            facultyCode: "MEDI",
+            description: "Training the next generation of healthcare professionals.",
+            deanFullname: "Dr. Marie Curie",
+            deanEducationLevel: "MD, PhD",
+            deanMessage: "Compassion and research are the heart of our work.",
+            deanImage: "http://localhost:3000/uploads/dean/med_dean.jpg"
+        },
     });
 
     const busFaculty = await prisma.faculty.upsert({
         where: { facultyCode: "BUSS" },
         update: {},
-        create: { name: "Business Administration", facultyCode: "BUSS" },
+        create: { 
+            name: "Business Administration", 
+            facultyCode: "BUSS",
+            description: "Developing leaders for the global economy.",
+            deanFullname: "Ms. Sheryl Sandberg",
+            deanEducationLevel: "MBA",
+            deanMessage: "Leadership is about making others better.",
+            deanImage: "http://localhost:3000/uploads/dean/bus_dean.jpg"
+        },
     });
 
     // ----------------------
-    // 2. Departments (using departmentCode and linking via facultyCode)
+    // 2. Departments (using departmentCode, facultyCode, and new Head fields)
     // ----------------------
     const csDept = await prisma.department.upsert({
         where: { departmentCode: "COMP" },
@@ -36,7 +59,12 @@ async function main() {
         create: { 
             name: "Computer Science", 
             departmentCode: "COMP", 
-            facultyCode: techFaculty.facultyCode // 🎯 Use code for linking
+            description: "Focusing on software, AI, and systems engineering.",
+            facultyCode: techFaculty.facultyCode,
+            headFullname: "Dr. Grace Hopper",
+            headEducationLevel: "PhD",
+            headMessage: "Code your future!",
+            headImage: "http://localhost:3000/uploads/head/cs_head.jpg"
         },
     });
 
@@ -46,21 +74,26 @@ async function main() {
         create: { 
             name: "Electrical Engineering", 
             departmentCode: "ELEC", 
-            facultyCode: techFaculty.facultyCode // 🎯 Use code for linking
+            description: "Covering power, electronics, and control systems.",
+            facultyCode: techFaculty.facultyCode,
+            headFullname: "Prof. Nikola Tesla",
+            headEducationLevel: "Prof.",
+            headMessage: "Harnessing the power of tomorrow.",
+            headImage: "http://localhost:3000/uploads/head/ee_head.jpg"
         },
     });
 
     // ----------------------
-    // 3. Programs (still link via departmentId)
+    // 3. Programs (LINKED VIA departmentCode STRING)
     // ----------------------
     await prisma.program.upsert({
         where: { name: "BSc Computer Science" },
         update: {},
         create: {
             name: "BSc Computer Science",
-            description: "Bachelor of Science in Computer Science",
+            description: "Bachelor of Science in Computer Science, 4 years.",
             durationYears: 4,
-            departmentId: csDept.id,
+            departmentCode: csDept.departmentCode, // 🎯 CRITICAL CHANGE: Use departmentCode string
         },
     });
 
@@ -69,14 +102,14 @@ async function main() {
         update: {},
         create: {
             name: "BSc Electrical Engineering",
-            description: "Bachelor of Science in Electrical Engineering",
+            description: "Bachelor of Science in Electrical Engineering, 4 years.",
             durationYears: 4,
-            departmentId: eeDept.id,
+            departmentCode: eeDept.departmentCode, // 🎯 CRITICAL CHANGE: Use departmentCode string
         },
     });
-
+    
     // ----------------------
-    // 4. Courses (still link via departmentId)
+    // 4. Courses (Still linked via departmentId INT - based on current schema)
     // ----------------------
     await prisma.course.upsert({
         where: { code: "CS101" },
@@ -86,8 +119,8 @@ async function main() {
             title: "Introduction to Programming",
             credits: 3,
             description: "Learn the basics of programming using Python.",
-            tuitionFee: "1500.00",
-            departmentId: csDept.id,
+            tuitionFee: 1500.00, // Pass as number to match Decimal
+            departmentId: csDept.id, // Linked by ID
         },
     });
 
@@ -99,32 +132,70 @@ async function main() {
             title: "Circuit Analysis",
             credits: 3,
             description: "Fundamentals of electrical circuits and analysis.",
-            tuitionFee: "1500.00",
-            departmentId: eeDept.id,
+            tuitionFee: 1500.00, // Pass as number to match Decimal
+            departmentId: eeDept.id, // Linked by ID
         },
     });
 
     // ----------------------
-    // 5. Static Content (No changes needed here)
+    // 5. Lecturers (Creating a sample lecturer linked to CS Dept ID)
+    // NOTE: Requires User/Lecturer setup in production, but simplified here.
+    // ----------------------
+    const sampleUser = await prisma.user.upsert({
+        where: { email: "lecturer@lucy.edu" },
+        update: {},
+        create: {
+            email: "lecturer@lucy.edu",
+            password: "hashed_password", // Placeholder
+            role: "LECTURER",
+        }
+    });
+
+    await prisma.lecturer.upsert({
+        where: { userId: sampleUser.id },
+        update: {},
+        create: {
+            userId: sampleUser.id,
+            firstName: "Alice",
+            lastName: "Smith",
+            title: "Ms.",
+            departmentId: csDept.id,
+            bio: "Expert in algorithms and data structures.",
+            imageUrl: "http://localhost:3000/uploads/lecturer/alice.jpg"
+        }
+    });
+
+    // ----------------------
+    // 6. Static Content
     // ----------------------
     
+    await prisma.academicYear.upsert({
+        where: { yearLabel: "2024/2025" },
+        update: {},
+        create: { yearLabel: "2024/2025" }
+    });
+
     await prisma.newsEvent.createMany({
         data: [
             {
                 title: "University Opens New Research Center",
                 content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                imageUrl: ["http://localhost:3000/uploads/news/img1.jpg"],
                 category: "Announcement",
                 isPublic: true,
             },
             {
                 title: "Annual Tech Fest Announced",
                 content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                imageUrl: ["http://localhost:3000/uploads/news/img2.jpg"],
                 category: "Events",
                 isPublic: true,
             },
         ],
         skipDuplicates: true,
     }); 
+
+    // ... (rest of the static content remains the same)
 
     const existingAbout = await prisma.about.findFirst();
     if (!existingAbout) {
