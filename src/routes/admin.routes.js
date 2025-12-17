@@ -7,6 +7,9 @@ import * as DeptCtrl from "../controllers/admin/department.controller.js";
 import * as CourseCtrl from "../controllers/admin/course.controller.js";
 import * as InquiryCtrl from "../controllers/admin/inquiry.controller.js";
 import * as FacultyCtrl from '../controllers/admin/faculty.controller.js';
+import * as ProgramCtrl from "../controllers/admin/program.controller.js";
+import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
+import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
 const router = express.Router();
 
 // require authentication + role for admin routes
@@ -59,6 +62,18 @@ router.get("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMidd
 router.put("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.update);
 router.delete("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
 
+// Programs
+router.get("/programs", authenticate, roleMiddleware(adminOnly), ProgramCtrl.list);
+router.post("/programs", authenticate, roleMiddleware(adminOnly), ProgramCtrl.create);
+router.get("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.getOne);
+router.put("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.update);
+router.delete("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.remove);
+
+// Curriculum Management
+router.get("/curriculum/:programId", authenticate, roleMiddleware(adminOnly), CurriculumCtrl.getProgramCurriculum);
+router.post("/curriculum", authenticate, roleMiddleware(adminOnly), CurriculumCtrl.addToCurriculum);
+router.put("/curriculum/:programId/:courseId", authenticate, roleMiddleware(adminOnly), CurriculumCtrl.updateCurriculum);
+router.delete("/curriculum/:programId/:courseId", authenticate, roleMiddleware(adminOnly), CurriculumCtrl.removeFromCurriculum);
 // Inquiries
 router.get("/inquiries", authenticate, roleMiddleware(adminOnly), InquiryCtrl.list);
 router.get("/inquiries/:id", authenticate, roleMiddleware(adminOnly), InquiryCtrl.getOne);
