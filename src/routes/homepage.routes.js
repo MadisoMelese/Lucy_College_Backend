@@ -10,8 +10,23 @@ router.get("/", HomepageController.get);
 
 // Admin routes (only SUPERADMIN, REGISTRAR)
 const adminRoles = ["SUPERADMIN", "REGISTRAR"];
-router.post("/", authenticate, roleMiddleware(adminRoles), HomepageController.create);
-router.put("/:id", authenticate, roleMiddleware(adminRoles), HomepageController.update);
-router.delete("/:id", authenticate, roleMiddleware(adminRoles), HomepageController.remove);
+router.post(
+  "/",
+  authenticate,
+  roleMiddleware(adminRoles),
+  HomepageController.create
+);
+router.put(
+  "/:id",
+  authenticate,
+  roleMiddleware(adminRoles),
+  HomepageController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  roleMiddleware(adminRoles),
+  HomepageController.remove
+);
 
 export default router;

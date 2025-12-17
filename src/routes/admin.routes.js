@@ -24,16 +24,14 @@ const setNewsFolder = (req, res, next) => {
 };
 
 const setFacultyFolder = (req, res, next) => {
-    // This must match the UPLOAD_SUBDIR in your controller
     req.uploadFolder = "faculty_dean"; 
     next();
 };
 const setDepartmentFolder = (req, res, next) => {
-    // This must match the UPLOAD_SUBDIR in your controller
     req.uploadFolder = "department_head"; 
     next();
 };
-// News (CRUD)
+// News Route
 router.get("/news", authenticate, roleMiddleware(adminOnly), NewsCtrl.list);
 router.post("/news", authenticate, roleMiddleware(adminOnly), setNewsFolder, upload.array('images', 10), NewsCtrl.create);
 router.get("/news/:id", authenticate, roleMiddleware(adminOnly), NewsCtrl.getOne);

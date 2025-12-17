@@ -11,8 +11,23 @@ router.get("/:id", TeamController.getOne);
 
 // Admin
 const adminRoles = ["SUPERADMIN", "REGISTRAR"];
-router.post("/", authenticate, roleMiddleware(adminRoles), TeamController.create);
-router.put("/:id", authenticate, roleMiddleware(adminRoles), TeamController.update);
-router.delete("/:id", authenticate, roleMiddleware(adminRoles), TeamController.remove);
+router.post(
+  "/",
+  authenticate,
+  roleMiddleware(adminRoles),
+  TeamController.create
+);
+router.put(
+  "/:id",
+  authenticate,
+  roleMiddleware(adminRoles),
+  TeamController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  roleMiddleware(adminRoles),
+  TeamController.remove
+);
 
 export default router;

@@ -111,28 +111,50 @@ model Department {
 }
 
 model Program {
-  id                  Int             @id @default(autoincrement())
-  name                String          @unique
-  description         String?
-  durationYears       Int             @default(4)
-  departmentCode      String          // Foreign Key: References Department.departmentCode
-  feeStructures       FeeStructure[]
-
-  department          Department      @relation(fields: [departmentCode], references: [departmentCode])
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  description    String?
+  durationYears  Int              @default(4)
+  departmentCode String
+  
+  // Relationships
+  department     Department       @relation(fields: [departmentCode], references: [departmentCode])
+  feeStructures  FeeStructure[]
+  
+  // NEW: Link to the curriculum (Join Table)
+  courses        ProgramCourse[] 
 }
 
 model Course {
-  id          Int     @id @default(autoincrement())
-  code        String  @unique
-  title       String
-  credits     Int
-  description String?
-  tuitionFee  Decimal @default(0.00) @db.Decimal(10, 2)
-
+  id             Int              @id @default(autoincrement())
+  code           String           @unique
+  title          String
+  credits        Int
+  description    String?
+  tuitionFee     Decimal          @default(0.00) @db.Decimal(10, 2)
   departmentCode String
-  department   Department @relation(fields: [departmentCode], references: [departmentCode])
 
-  registrations CourseRegistration[]
+  // Relationships
+  department     Department       @relation(fields: [departmentCode], references: [departmentCode])
+  registrations  CourseRegistration[]
+  
+  // NEW: Link to the programs that use this course
+  programs       ProgramCourse[]
+}
+
+// ==========================================================
+// NEW JOIN TABLE: PROGRAM CURRICULUM
+// ==========================================================
+model ProgramCourse {
+  programId    Int
+  courseId     Int
+  yearLevel    Int      // e.g., 1, 2, 3, 4
+  semester     Int      // e.g., 1 or 2
+
+  program      Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([programId, courseId]) // Prevents duplicate course assignment in the same program
 }
 
 // ==========================================================

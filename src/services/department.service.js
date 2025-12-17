@@ -105,12 +105,12 @@ export const findDepartmentByCode = async (departmentCode) => {
 export const createDepartment = async (
   name,
   facultyCode,
-  inputDepartmentCode,
-  description, // <--- NEW
-  headImagePath, // <--- NEW
-  headFullname, // <--- NEW
-  headEducationLevel, // <--- NEW
-  headMessage // <--- NEW
+  inputDepartmentCode, 
+  description, 
+  headImagePath, 
+  headFullname, 
+  headEducationLevel, 
+  headMessage 
 ) => {
   const facultyCheck = await prisma.faculty.findUnique({
     where: { facultyCode: facultyCode.toUpperCase() },
