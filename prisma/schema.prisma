@@ -121,8 +121,8 @@ model Program {
   department     Department       @relation(fields: [departmentCode], references: [departmentCode])
   feeStructures  FeeStructure[]
   
-  // NEW: Link to the curriculum (Join Table)
-  courses        ProgramCourse[] 
+  // Choose ONLY ONE of these. Let's use 'courses':
+  curriculum     ProgramCourse[]
 }
 
 model Course {
@@ -148,13 +148,13 @@ model Course {
 model ProgramCourse {
   programId    Int
   courseId     Int
-  yearLevel    Int      // e.g., 1, 2, 3, 4
-  semester     Int      // e.g., 1 or 2
+  yearLevel    Int      
+  semester     Int      
 
   program      Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
   course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@id([programId, courseId]) // Prevents duplicate course assignment in the same program
+  @@id([programId, courseId])
 }
 
 // ==========================================================

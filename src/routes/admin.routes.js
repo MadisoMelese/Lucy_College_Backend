@@ -9,7 +9,6 @@ import * as InquiryCtrl from "../controllers/admin/inquiry.controller.js";
 import * as FacultyCtrl from '../controllers/admin/faculty.controller.js';
 import * as ProgramCtrl from "../controllers/admin/program.controller.js";
 import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
-import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
 const router = express.Router();
 
 // require authentication + role for admin routes

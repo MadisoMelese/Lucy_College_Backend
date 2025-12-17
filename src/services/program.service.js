@@ -1,5 +1,6 @@
 import prisma from "../config/database.js";
 
+// program.service.js
 export const findPrograms = async (skip, limit) => {
     const items = await prisma.program.findMany({
         skip,
@@ -7,7 +8,10 @@ export const findPrograms = async (skip, limit) => {
         include: {
             department: true,
             _count: {
-                select: { courses: true } // Counts courses in curriculum
+                select: { 
+                    curriculum: true, // This now matches the cleaned schema
+                    feeStructures: true 
+                } 
             }
         },
         orderBy: { name: "asc" },
