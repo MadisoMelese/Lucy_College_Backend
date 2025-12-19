@@ -13,7 +13,8 @@ router.get("/faculties/:facultyCode", FacultyController.getOne);
 // Departments
 router.get("/departments", DepartmentController.getAll);
 router.get("/:facultyCode/departments", DepartmentController.getByFacultyCode);
-router.get("/departments/:id", DepartmentController.getOne);
+router.get("/departments/id/:id", DepartmentController.getOneById);
+router.get("/departments/code/:departmentCode", DepartmentController.getOne);
 
 // Courses
 router.get("/courses", CourseController.getAll);

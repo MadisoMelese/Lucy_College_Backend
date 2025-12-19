@@ -34,12 +34,30 @@ export const getByFacultyCode = async (req, res) => {
     }
 };
 
-export const getOne = async (req, res) => {
+export const getOneById = async (req, res) => {
   try {
     const { id } = req.params;
     const department = await DeptService.getDepartmentById(id);
     if (!department) return errorResponse(res, "Department not found", 404);
     return success(res, department);
+  } catch (err) {
+    return errorResponse(res, err.message);
+  }
+};
+
+export const getOne = async (req, res) => {
+  try {
+    const departmentCode = req.params.departmentCode;
+
+    const dep = await DeptService.findDepartmentByCode(departmentCode);
+
+    if (!dep) return errorResponse(res, "Not found", 404);
+
+    if (dep.headImage) {
+      dep.headImage = fileUrl(req, dep.headImage);
+    }
+
+    return success(res, dep);
   } catch (err) {
     return errorResponse(res, err.message);
   }
