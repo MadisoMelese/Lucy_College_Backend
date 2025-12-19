@@ -3,7 +3,7 @@ import { success, errorResponse } from "../utils/apiResponse.js";
 
 export const getAll = async (req, res) => {
   try {
-    const courses = await CourseService.getAllCourses();
+    const courses = await CourseService.findCourses();
     return success(res, courses);
   } catch (err) {
     return errorResponse(res, err.message);
