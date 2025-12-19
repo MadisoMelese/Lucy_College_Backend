@@ -110,12 +110,31 @@ model Department {
   courses             Course[]
 }
 
+enum ProgramType {
+  DEGREE
+  DIPLOMA
+  CERTIFICATE
+  MASTERS
+  PHD
+}
+
+enum DeliveryMode {
+  REGULAR
+  EXTENSION
+  SUMMER
+  DISTANCE
+  ONLINE
+  NIGHT
+}
+
 model Program {
   id             Int              @id @default(autoincrement())
   name           String           @unique
   description    String?
   durationYears  Int              @default(4)
   departmentCode String
+  deliveryMode   DeliveryMode          @default(REGULAR)
+  programType    ProgramType          @default(DEGREE)
   
   // Relationships
   department     Department       @relation(fields: [departmentCode], references: [departmentCode])
