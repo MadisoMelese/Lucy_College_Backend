@@ -49,8 +49,11 @@ router.put("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), s
 router.delete("/faculties/:facultyCode", authenticate, roleMiddleware(adminOnly), FacultyCtrl.remove);
 // Departments
 router.get("/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
+router.get("/:facultyCode/departments", authenticate, roleMiddleware(adminOnly), DeptCtrl.list);
 router.post("/departments", authenticate, roleMiddleware(adminOnly), setDepartmentFolder, headImageUpload, DeptCtrl.create);
-router.get("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
+router.get("/departments/code/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOne);
+router.get("/departments/id/:id", authenticate, roleMiddleware(adminOnly), DeptCtrl.getOneById);
+
 router.put("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), setDepartmentFolder, headImageUpload, DeptCtrl.update);
 router.delete("/departments/:departmentCode", authenticate, roleMiddleware(adminOnly), DeptCtrl.remove);
 

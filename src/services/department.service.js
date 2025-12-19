@@ -167,6 +167,13 @@ export const findDepartmentByCode = async (departmentCode) => {
   };
 };
 
+export const getDepartmentById = async (id) => {
+  return await prisma.department.findUnique({
+    where: { id: parseInt(id) },
+    include: { faculty: true },
+  });
+};
+
 export const createDepartment = async (
   name,
   facultyCode,
