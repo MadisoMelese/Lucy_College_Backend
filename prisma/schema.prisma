@@ -140,7 +140,6 @@ model Program {
   department     Department       @relation(fields: [departmentCode], references: [departmentCode])
   feeStructures  FeeStructure[]
   
-  // Choose ONLY ONE of these. Let's use 'courses':
   curriculum     ProgramCourse[]
 }
 
