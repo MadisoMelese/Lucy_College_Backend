@@ -9,9 +9,10 @@ const router = express.Router();
 
 // Faculties
 router.get("/faculties", FacultyController.list);
-router.get("/faculties/:id", FacultyController.getOne);
+router.get("/faculties/:facultyCode", FacultyController.getOne);
 // Departments
 router.get("/departments", DepartmentController.getAll);
+router.get("/:facultyCode/departments", DepartmentController.getByFacultyCode);
 router.get("/departments/:id", DepartmentController.getOne);
 
 // Courses

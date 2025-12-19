@@ -68,6 +68,71 @@ export const findDepartments = async (skip, limit) => {
   return { items: departmentsWithCounts, total };
 };
 
+export const findDepartmentByFacultyCode = async (skip, limit, facultyCode) => {
+    const code = facultyCode.toUpperCase();
+
+    // 1. Fetch departments with basic counts
+    const departments = await prisma.department.findMany({
+        skip,
+        take: limit,
+        where: { facultyCode: code },
+        include: {
+            faculty: true,
+            _count: {
+                select: {
+                    programs: true,
+                    lecturers: true,
+                    courses: true,
+                }
+            },
+            courses: { select: { id: true } }, // Still need IDs for the student count logic
+        },
+        orderBy: { name: "asc" },
+    });
+
+    const total = await prisma.department.count({
+        where: { facultyCode: code },
+    });
+
+    // 2. Optimized Student Counting
+    // We process all departments in this faculty to get unique student counts
+    const items = await Promise.all(
+        departments.map(async (dep) => {
+            const courseIds = dep.courses.map((c) => c.id);
+
+            // Use 'count' with 'distinct' if your Prisma version supports it, 
+            // otherwise this optimized findMany is okay for mid-size data.
+            const studentCount = await prisma.courseRegistration.count({
+                where: {
+                    courseId: { in: courseIds },
+                },
+                // Note: Prisma count doesn't support distinct directly in all versions.
+                // If you need strict unique student counts across many courses:
+            });
+
+            // Better way for strict unique students:
+            const uniqueStudents = await prisma.courseRegistration.groupBy({
+                by: ['studentId'],
+                where: { courseId: { in: courseIds } },
+            });
+
+            const { courses, ...departmentData } = dep;
+
+            return {
+                ...departmentData,
+                totalStudents: uniqueStudents.length,
+                stats: {
+                    programCount: dep._count.programs,
+                    lecturerCount: dep._count.lecturers,
+                    courseCount: dep._count.courses
+                }
+            };
+        })
+    );
+
+    return { items, total };
+};
+
 export const findDepartmentByCode = async (departmentCode) => {
   const department = await prisma.department.findUnique({
     where: { departmentCode: departmentCode.toUpperCase() },

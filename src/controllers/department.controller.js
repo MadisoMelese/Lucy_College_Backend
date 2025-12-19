@@ -1,13 +1,37 @@
 import * as DeptService from "../services/department.service.js";
 import { success, errorResponse } from "../utils/apiResponse.js";
+import { fileUrl } from "../utils/fileUrl.js";
+import { parsePagination } from "../utils/pagination.js";
 
 export const getAll = async (req, res) => {
   try {
-    const departments = await DeptService.getAllDepartments();
+    const departments = await DeptService.findDepartments();
     return success(res, departments);
   } catch (err) {
     return errorResponse(res, err.message);
   } 
+};
+
+export const getByFacultyCode = async (req, res) => {
+    try {
+        const { facultyCode } = req.params; 
+        const { limit, skip, page } = parsePagination(req); 
+
+        // FIX: Pass all three required arguments
+        const { items, total } = await DeptService.findDepartmentByFacultyCode(skip, limit, facultyCode);
+
+        // Process images for the departments
+        const processedItems = items.map(item => {
+            if (item.headImage) {
+                item.headImage = fileUrl(req, item.headImage);
+            }
+            return item;
+        });
+
+        return success(res, { items: processedItems, total, page });
+    } catch (err) {
+        return errorResponse(res, err.message);
+    }
 };
 
 export const getOne = async (req, res) => {
