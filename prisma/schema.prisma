@@ -348,7 +348,7 @@ model TeamMember {
   fullName   String
   role       String   // e.g., "Principal", "Registrar"
   bio        String?
-  imageUrl   String?  // optional portrait url
+  imageUrl   String?  
   email      String?  @unique
   phone      String?
   order      Int      @default(0)
