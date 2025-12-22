@@ -62,12 +62,14 @@ router.get("/:facultyCode/:departmentCode/courses", authenticate, roleMiddleware
 router.post("/:facultyCode/:departmentCode/courses", authenticate, roleMiddleware(adminOnly), CourseCtrl.create);
 router.get("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.getOne);
 router.put("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.update);
-router.delete("/:facultyCode/:departmentCode/courses/:code", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
+router.delete("/:facultyCode/:departmentCode/courses/:id", authenticate, roleMiddleware(adminOnly), CourseCtrl.remove);
 
 // Programs
 router.get("/programs", authenticate, roleMiddleware(adminOnly), ProgramCtrl.list);
 router.post("/programs", authenticate, roleMiddleware(adminOnly), ProgramCtrl.create);
 router.get("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.getOne);
+router.get("/programs/departmentCode/:departmentCode", ProgramCtrl.findProgramByDepartmentCode);
+
 router.put("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.update);
 router.delete("/programs/:id", authenticate, roleMiddleware(adminOnly), ProgramCtrl.remove);
 
