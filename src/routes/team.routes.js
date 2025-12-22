@@ -2,29 +2,37 @@ import { Router } from "express";
 import { TeamController } from "../controllers/team.controller.js";
 import authenticate from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
-
+import { upload } from "../config/multer.js";
+const setManagementFolder = (req, res, next) => {
+  req.uploadFolder = "management";
+  next();
+};
 const router = Router();
 
 // Public
-router.get("/", TeamController.list);
-router.get("/:id", TeamController.getOne);
+router.get("/admin", TeamController.list);
+router.get("/admin/:id", TeamController.getOne);
 
 // Admin
 const adminRoles = ["SUPERADMIN", "REGISTRAR"];
 router.post(
-  "/",
+  "/admin",
   authenticate,
   roleMiddleware(adminRoles),
+  setManagementFolder,
+  upload.single('image'),
   TeamController.create
 );
 router.put(
-  "/:id",
+  ".admin/:id",
   authenticate,
   roleMiddleware(adminRoles),
+  setManagementFolder,
+  upload.single('image'),
   TeamController.update
 );
 router.delete(
-  "/:id",
+  "/admin/:id",
   authenticate,
   roleMiddleware(adminRoles),
   TeamController.remove
