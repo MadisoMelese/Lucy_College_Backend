@@ -1,30 +1,103 @@
 import { TeamService } from "../services/team.service.js";
 import { success, created, errorResponse } from "../utils/apiResponse.js";
-import { z } from "zod";
 import { parsePagination } from "../utils/pagination.js";
+import { deleteFile, fileUrl } from "../utils/fileUrl.js";
+import { z } from "zod";
 
-const createSchema = z.object({
-  fullName: z.string().min(1),
-  role: z.string().min(1),
+const teamSchema = z.object({
+  fullName: z.string().min(2, "Name is too short"),
+  role: z.string().min(1, "Role is required"),
   bio: z.string().optional(),
-  imageUrl: z.string().url().optional(),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  order: z.number().optional(),
-  isActive: z.boolean().optional(),
-  social: z.record(z.string()).optional(), // object of social links
+  email: z.string().email().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  order: z.preprocess((val) => {
+    if (val === "" || val === undefined || val === null) return 0;
+    const parsed = Number(val);
+    return isNaN(parsed) ? 0 : parsed;
+  }, z.number().default(0)),
+  isActive: z.preprocess((val) => {
+    if (val === 'true' || val === true) return true;
+    if (val === 'false' || val === false) return false;
+    return true;
+  }, z.boolean().default(true)),
+  social: z.preprocess((val) => {
+    if (!val || val === "") return null;
+    try {
+      return typeof val === 'string' ? JSON.parse(val) : val;
+    } catch {
+      return null;
+    }
+  }, z.record(z.string()).optional().nullable())
 });
 
+const formatZodError = (err) => err.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+
 export const TeamController = {
+  async create(req, res) {
+    try {
+      const validatedData = teamSchema.parse(req.body);
+
+      if (req.file) {
+        const folder = req.uploadFolder || "misc";
+        validatedData.imageUrl = `${folder}/${req.file.filename}`;
+      }
+
+      const item = await TeamService.create(validatedData);
+      
+      return created(res, {
+        ...item,
+        imageUrl: fileUrl(req, item.imageUrl)
+      }, "Team member created");
+    } catch (err) {
+      if (req.file) deleteFile(req.file.path);
+      const msg = err instanceof z.ZodError ? formatZodError(err) : err.message;
+      return errorResponse(res, msg, 400);
+    }
+  },
+
+  async update(req, res) {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id)) return errorResponse(res, "Invalid ID", 400);
+
+      const validatedData = teamSchema.partial().parse(req.body);
+
+      if (req.file) {
+        const folder = req.uploadFolder || "misc";
+        validatedData.imageUrl = `${folder}/${req.file.filename}`;
+      }
+
+      const item = await TeamService.update(id, validatedData);
+      
+      return success(res, {
+        ...item,
+        imageUrl: fileUrl(req, item.imageUrl)
+      }, "Updated successfully");
+    } catch (err) {
+      if (req.file) deleteFile(req.file.path);
+      const msg = err instanceof z.ZodError ? formatZodError(err) : err.message;
+      return errorResponse(res, msg, 400);
+    }
+  },
+
   async list(req, res) {
     try {
-      const { limit, skip } = parsePagination(req);
-      const items = await TeamService.list({
+      const { limit, skip, page } = parsePagination(req);
+      const isAdmin = req.originalUrl.includes('/admin');
+      
+      const { items, total } = await TeamService.list({
         skip,
         take: limit,
-        onlyActive: true,
+        isActive: isAdmin ? undefined : true,
+        search: req.query.search
       });
-      return success(res, items);
+
+      const formattedItems = items.map(item => ({
+        ...item,
+        imageUrl: fileUrl(req, item.imageUrl)
+      }));
+
+      return success(res, { items: formattedItems, total, page });
     } catch (err) {
       return errorResponse(res, err.message);
     }
@@ -32,40 +105,28 @@ export const TeamController = {
 
   async getOne(req, res) {
     try {
-      const item = await TeamService.getById(req.params.id);
+      const id = Number(req.params.id);
+      if (isNaN(id)) return errorResponse(res, "Invalid ID", 400);
+
+      const item = await TeamService.getById(id);
       if (!item) return errorResponse(res, "Not found", 404);
-      return success(res, item);
+      
+      return success(res, {
+        ...item,
+        imageUrl: fileUrl(req, item.imageUrl)
+      });
     } catch (err) {
       return errorResponse(res, err.message);
-    }
-  },
-
-  async create(req, res) {
-    try {
-      const parsed = createSchema.parse(req.body);
-      const item = await TeamService.create(parsed);
-      return created(res, item, "Team member created");
-    } catch (err) {
-      return errorResponse(res, err.message, 400);
-    }
-  },
-
-  async update(req, res) {
-    try {
-      const parsed = createSchema.partial().parse(req.body);
-      const item = await TeamService.update(Number(req.params.id), parsed);
-      return success(res, item, "Updated");
-    } catch (err) {
-      return errorResponse(res, err.message, 400);
     }
   },
 
   async remove(req, res) {
     try {
-      await TeamService.remove(Number(req.params.id));
-      return success(res, null, "Deleted");
+      await TeamService.remove(req.params.id);
+      return success(res, null, "Member deleted successfully");
     } catch (err) {
-      return errorResponse(res, err.message);
+      const status = err.message === "Team member not found." ? 404 : 400;
+      return errorResponse(res, err.message, status);
     }
-  },
+  }
 };
