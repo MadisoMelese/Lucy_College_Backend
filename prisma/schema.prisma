@@ -156,7 +156,7 @@ model Course {
   department     Department       @relation(fields: [departmentCode], references: [departmentCode])
   registrations  CourseRegistration[]
   
-  // NEW: Link to the programs that use this course
+  // the programs that use this course
   programs       ProgramCourse[]
 }
 
