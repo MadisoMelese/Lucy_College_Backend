@@ -6,6 +6,7 @@ import * as InquiryController from "../controllers/inquiry.controller.js";
 import * as FacultyController from "../controllers/admin/faculty.controller.js";
 import * as CourseCtrl from "../controllers/admin/course.controller.js";
 import * as ProgramCtrl from "../controllers/admin/program.controller.js";
+import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
 
 const router = express.Router();
 
@@ -37,6 +38,12 @@ router.get("/courses/:code", CourseController.getOne);
 router.get("/news", NewsController.getAll);
 router.get("/news/:id", NewsController.getOne);
 router.get("/news/category/:category", NewsController.getByCategory);
+
+// curriculum 
+router.get(
+  "/curriculum/:programId", 
+  CurriculumCtrl.getProgramCurriculum
+);
 
 // Inquiry
 router.post("/inquiry", InquiryController.create);
