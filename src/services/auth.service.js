@@ -6,7 +6,7 @@ import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/env.js";
 export const registerUser = async ({ email, password, role = "STUDENT" }) => {
   const hashed = await hashPassword(password);
   const user = await prisma.user.create({
-    data: { email, password: hashed, role }
+    data: { email, password: hashed, role },
   });
   return user;
 };
@@ -37,5 +37,3 @@ export const isTokenBlacklisted = async (token) => {
   if (!entry) return false;
   return entry.expiresAt.getTime() > Date.now();
 };
-
-

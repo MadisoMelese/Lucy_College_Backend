@@ -15,5 +15,5 @@ export const HomepageService = {
 
   async remove(id) {
     return prisma.homepage.delete({ where: { id: Number(id) } });
-  }
+  },
 };

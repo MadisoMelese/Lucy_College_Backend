@@ -18,5 +18,5 @@ export const HeroService = {
 
   delete(id) {
     return prisma.heroSlide.delete({ where: { id } });
-  }
+  },
 };

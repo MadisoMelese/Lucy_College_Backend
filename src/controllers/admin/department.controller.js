@@ -32,25 +32,29 @@ export const list = async (req, res) => {
 };
 
 export const getByFacultyCode = async (req, res) => {
-    try {
-        const { facultyCode } = req.params; 
-        const { limit, skip, page } = parsePagination(req); 
+  try {
+    const { facultyCode } = req.params;
+    const { limit, skip, page } = parsePagination(req);
 
-        // FIX: Pass all three required arguments
-        const { items, total } = await DeptService.findDepartmentByFacultyCode(skip, limit, facultyCode);
+    // FIX: Pass all three required arguments
+    const { items, total } = await DeptService.findDepartmentByFacultyCode(
+      skip,
+      limit,
+      facultyCode
+    );
 
-        // Process images for the departments
-        const processedItems = items.map(item => {
-            if (item.headImage) {
-                item.headImage = fileUrl(req, item.headImage);
-            }
-            return item;
-        });
+    // Process images for the departments
+    const processedItems = items.map((item) => {
+      if (item.headImage) {
+        item.headImage = fileUrl(req, item.headImage);
+      }
+      return item;
+    });
 
-        return success(res, { items: processedItems, total, page });
-    } catch (err) {
-        return errorResponse(res, err.message);
-    }
+    return success(res, { items: processedItems, total, page });
+  } catch (err) {
+    return errorResponse(res, err.message);
+  }
 };
 
 // --- GET ONE: Add fileUrl to image if exists
@@ -82,9 +86,6 @@ export const getOneById = async (req, res) => {
     return errorResponse(res, err.message);
   }
 };
-
-
-
 
 export const create = async (req, res) => {
   // Get file info from Multer

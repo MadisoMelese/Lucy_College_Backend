@@ -8,12 +8,12 @@ export const TeamService = {
       where,
       orderBy: { order: "asc" },
       skip,
-      take
+      take,
     });
   },
 
   async getById(id) {
-    return prisma.teamMember.findUnique({ where: { id: Number(id) }});
+    return prisma.teamMember.findUnique({ where: { id: Number(id) } });
   },
 
   async create(data) {
@@ -25,6 +25,6 @@ export const TeamService = {
   },
 
   async remove(id) {
-    return prisma.teamMember.delete({ where: { id: Number(id) }});
-  }
+    return prisma.teamMember.delete({ where: { id: Number(id) } });
+  },
 };

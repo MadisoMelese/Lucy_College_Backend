@@ -13,13 +13,13 @@ export const AboutService = {
   async updateAbout(id, data) {
     return await prisma.about.update({
       where: { id },
-      data
+      data,
     });
   },
 
   async deleteAbout(id) {
     return await prisma.about.delete({
-      where: { id }
+      where: { id },
     });
-  }
+  },
 };

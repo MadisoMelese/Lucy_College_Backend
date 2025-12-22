@@ -13,24 +13,26 @@ const router = express.Router();
 router.get("/faculties", FacultyController.list);
 router.get("/faculties/:facultyCode", FacultyController.getOne);
 
-
 // Departments
-router.get("/departments", DepartmentController.getAll);  //fetching departments without any filters
+router.get("/departments", DepartmentController.getAll); //fetching departments without any filters
 router.get("/:facultyCode/departments", DepartmentController.getByFacultyCode); //fetching departments by faculty code under specific faculty
-router.get("/departments/id/:id", DepartmentController.getOneById);  //fetching department by ID
+router.get("/departments/id/:id", DepartmentController.getOneById); //fetching department by ID
 router.get("/departments/code/:departmentCode", DepartmentController.getOne); //fetching department by department code
 
 // programmes
 router.get("/programs", ProgramCtrl.list);
 
 router.get("/programs/:id", ProgramCtrl.getOne);
-router.get("/programs/departmentCode/:departmentCode", ProgramCtrl.findProgramByDepartmentCode);
+router.get(
+  "/programs/departmentCode/:departmentCode",
+  ProgramCtrl.findProgramByDepartmentCode
+);
 
 // Courses
 router.get("/courses", CourseController.getAll);
 router.get("/courses/:facultyCode/:departmentCode", CourseCtrl.list);
 router.get("/courses/:code", CourseController.getOne);
- 
+
 // News
 router.get("/news", NewsController.getAll);
 router.get("/news/:id", NewsController.getOne);

@@ -10,7 +10,7 @@ export const AboutController = {
     const about = await AboutService.createAbout(req.body);
     res.status(201).json({
       message: "About section created successfully",
-      data: about
+      data: about,
     });
   },
 
@@ -20,7 +20,7 @@ export const AboutController = {
 
     res.status(200).json({
       message: "About section updated successfully",
-      data: about
+      data: about,
     });
   },
 
@@ -29,7 +29,7 @@ export const AboutController = {
     await AboutService.deleteAbout(Number(id));
 
     res.status(200).json({
-      message: "About section deleted successfully"
+      message: "About section deleted successfully",
     });
-  }
+  },
 };

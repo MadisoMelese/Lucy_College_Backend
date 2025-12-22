@@ -7,7 +7,7 @@ const createSchema = z.object({
   heroSubtitle: z.string().optional(),
   heroCtaText: z.string().optional(),
   heroCtaUrl: z.string().url().optional(),
-  introText: z.string().optional()
+  introText: z.string().optional(),
 });
 
 export const HomepageController = {
@@ -49,5 +49,5 @@ export const HomepageController = {
     } catch (err) {
       return errorResponse(res, err.message);
     }
-  }
+  },
 };

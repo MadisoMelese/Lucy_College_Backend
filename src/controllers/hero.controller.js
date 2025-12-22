@@ -49,7 +49,8 @@ export const HeroController = {
     });
 
     // Prisma model does not have `image` field; ensure it's not sent.
-    if (Object.prototype.hasOwnProperty.call(incoming, "image")) delete incoming.image;
+    if (Object.prototype.hasOwnProperty.call(incoming, "image"))
+      delete incoming.image;
 
     const updated = await HeroService.update(Number(id), incoming);
     res.json(updated);

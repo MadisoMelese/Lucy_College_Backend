@@ -12,14 +12,18 @@ const createSchema = z.object({
   phone: z.string().optional(),
   order: z.number().optional(),
   isActive: z.boolean().optional(),
-  social: z.record(z.string()).optional() // object of social links
+  social: z.record(z.string()).optional(), // object of social links
 });
 
 export const TeamController = {
   async list(req, res) {
     try {
       const { limit, skip } = parsePagination(req);
-      const items = await TeamService.list({ skip, take: limit, onlyActive: true });
+      const items = await TeamService.list({
+        skip,
+        take: limit,
+        onlyActive: true,
+      });
       return success(res, items);
     } catch (err) {
       return errorResponse(res, err.message);
@@ -63,5 +67,5 @@ export const TeamController = {
     } catch (err) {
       return errorResponse(res, err.message);
     }
-  }
+  },
 };

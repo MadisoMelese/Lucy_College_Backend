@@ -9,7 +9,7 @@ const createSchema = z.object({
   imageUrl: z.string().url(),
   category: z.string().optional(),
   order: z.number().optional(),
-  isActive: z.boolean().optional()
+  isActive: z.boolean().optional(),
 });
 
 export const GalleryController = {
@@ -17,7 +17,12 @@ export const GalleryController = {
     try {
       const { limit, skip } = parsePagination(req);
       const category = req.query.category;
-      const items = await GalleryService.list({ skip, take: limit, category, onlyActive: true });
+      const items = await GalleryService.list({
+        skip,
+        take: limit,
+        category,
+        onlyActive: true,
+      });
       return success(res, items);
     } catch (err) {
       return errorResponse(res, err.message);
@@ -61,5 +66,5 @@ export const GalleryController = {
     } catch (err) {
       return errorResponse(res, err.message);
     }
-  }
+  },
 };

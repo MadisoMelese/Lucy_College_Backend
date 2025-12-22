@@ -9,12 +9,12 @@ export const GalleryService = {
       where,
       orderBy: { order: "asc" },
       skip,
-      take
+      take,
     });
   },
 
   async getById(id) {
-    return prisma.galleryImage.findUnique({ where: { id: Number(id) }});
+    return prisma.galleryImage.findUnique({ where: { id: Number(id) } });
   },
 
   async create(data) {
@@ -26,6 +26,6 @@ export const GalleryService = {
   },
 
   async remove(id) {
-    return prisma.galleryImage.delete({ where: { id: Number(id) }});
-  }
+    return prisma.galleryImage.delete({ where: { id: Number(id) } });
+  },
 };

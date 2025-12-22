@@ -7,10 +7,10 @@ export const getAll = async (req, res) => {
   try {
     const items = await NewsService.getAllNews();
 
-    const processedItems = items.map(item => {
+    const processedItems = items.map((item) => {
       // item.imageUrl is now String[]
       if (item.imageUrl && item.imageUrl.length > 0) {
-        item.imageUrl = item.imageUrl.map(filePath => fileUrl(req, filePath));
+        item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
       }
       return item;
     });
@@ -26,14 +26,15 @@ export const getOne = async (req, res) => {
     const article = await NewsService.getNewsById(id);
     if (!article) return errorResponse(res, "News article not found", 404);
     if (article.imageUrl && article.imageUrl.length > 0) {
-        article.imageUrl = article.imageUrl.map(filePath => fileUrl(req, filePath));
+      article.imageUrl = article.imageUrl.map((filePath) =>
+        fileUrl(req, filePath)
+      );
     }
     return success(res, article);
   } catch (err) {
     return errorResponse(res, err.message);
   }
 };
-
 
 export const getByCategory = async (req, res) => {
   try {
@@ -45,10 +46,10 @@ export const getByCategory = async (req, res) => {
       skip,
       limit
     );
-    const processedItems = items.map(item => {
+    const processedItems = items.map((item) => {
       // item.imageUrl is now String[]
       if (item.imageUrl && item.imageUrl.length > 0) {
-        item.imageUrl = item.imageUrl.map(filePath => fileUrl(req, filePath));
+        item.imageUrl = item.imageUrl.map((filePath) => fileUrl(req, filePath));
       }
       return item;
     });
@@ -62,12 +63,10 @@ export const getByCategory = async (req, res) => {
         page,
         totalPages,
         hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
+        hasPrevPage: page > 1,
+      },
     });
   } catch (err) {
     return errorResponse(res, err.message);
   }
 };
-
-

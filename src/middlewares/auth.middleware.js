@@ -15,7 +15,8 @@ export default async function authenticate(req, res, next) {
 
     // Check blacklist
     const blacklisted = await AuthService.isTokenBlacklisted(token);
-    if (blacklisted) return errorResponse(res, "Token revoked (logged out)", 401);
+    if (blacklisted)
+      return errorResponse(res, "Token revoked (logged out)", 401);
 
     req.user = payload; // { id, email, role, iat, exp }
     return next();
@@ -30,4 +31,3 @@ export function isAdmin(req, res, next) {
   }
   next();
 }
-

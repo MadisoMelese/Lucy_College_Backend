@@ -6,8 +6,12 @@ export const list = async (req, res) => {
   try {
     const { skip, limit, page } = parsePagination(req);
     const [items, total] = await Promise.all([
-      prisma.inquiry.findMany({ skip, take: limit, orderBy: { createdAt: "desc" } }),
-      prisma.inquiry.count()
+      prisma.inquiry.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.inquiry.count(),
     ]);
     return success(res, { items, total, page });
   } catch (err) {
@@ -30,7 +34,10 @@ export const update = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { status } = req.body;
-    const item = await prisma.inquiry.update({ where: { id }, data: { status } });
+    const item = await prisma.inquiry.update({
+      where: { id },
+      data: { status },
+    });
     return success(res, item, "Updated");
   } catch (err) {
     return errorResponse(res, err.message);

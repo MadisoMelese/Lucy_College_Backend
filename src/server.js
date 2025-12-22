@@ -3,8 +3,10 @@ import { PORT } from "./config/env.js";
 import prisma from "./config/database.js";
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server listening on http://localhost:${PORT} (env=${process.env.NODE_ENV})`);
-  console.log(`swagger file running on http://localhost:${PORT}/docs`)
+  console.log(
+    `🚀 Server listening on http://localhost:${PORT} (env=${process.env.NODE_ENV})`
+  );
+  console.log(`swagger file running on http://localhost:${PORT}/docs`);
 });
 
 const shutdown = async () => {
