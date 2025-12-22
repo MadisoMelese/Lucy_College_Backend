@@ -95,6 +95,18 @@ export const getOne = async (req, res) => {
     }
 };
 
+export const findProgramByDepartmentCode = async (req, res) => {
+    try {
+        const { departmentCode } = req.params;
+        const item = await ProgramService.findProgramByDepartmentCode(departmentCode);
+
+        if (!item) return errorResponse(res, "Department not found", 404);
+        return success(res, item);
+    } catch (err) {
+        return errorResponse(res, err.message);
+    }
+};
+
 export const create = async (req, res) => {
     try {
         const item = await ProgramService.createProgram(req.body);
