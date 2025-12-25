@@ -45,6 +45,9 @@ router.get(
   CurriculumCtrl.getProgramCurriculum
 );
 
+// team
+router.get("/list", TeamController.list);
+router.get("/list/:id", TeamController.getOne);
 // Inquiry
 router.post("/inquiry", InquiryController.create);
 
