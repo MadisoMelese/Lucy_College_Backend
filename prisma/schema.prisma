@@ -350,6 +350,8 @@ model TeamMember {
   bio        String?
   imageUrl   String?  
   email      String?  @unique
+  company    String?
+  companyPosition String?
   phone      String?
   order      Int      @default(0)
   isActive   Boolean  @default(true)
