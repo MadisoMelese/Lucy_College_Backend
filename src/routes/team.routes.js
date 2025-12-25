@@ -9,12 +9,15 @@ const setManagementFolder = (req, res, next) => {
 };
 const router = Router();
 
-// Public
-router.get("/admin", TeamController.list);
-router.get("/admin/:id", TeamController.getOne);
+
 
 // Admin
 const adminRoles = ["SUPERADMIN", "REGISTRAR"];
+
+router.get("/list",   authenticate,
+  roleMiddleware(adminRoles), TeamController.list);
+router.get("/list/:id",   authenticate,
+  roleMiddleware(adminRoles), TeamController.getOne);
 router.post(
   "/admin",
   authenticate,
