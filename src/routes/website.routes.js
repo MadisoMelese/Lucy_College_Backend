@@ -7,6 +7,8 @@ import * as FacultyController from "../controllers/admin/faculty.controller.js";
 import * as CourseCtrl from "../controllers/admin/course.controller.js";
 import * as ProgramCtrl from "../controllers/admin/program.controller.js";
 import * as CurriculumCtrl from "../controllers/admin/curriculum.controller.js";
+import { TeamController } from "../controllers/team.controller.js";
+
 
 const router = express.Router();
 
