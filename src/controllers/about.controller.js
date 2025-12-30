@@ -1,5 +1,5 @@
 import { AboutService } from "../services/about.service.js";
-
+// I've to implement image uploader using multer 
 export const AboutController = {
   async get(req, res) {
     const about = await AboutService.getAbout();
